@@ -1,17 +1,37 @@
+// backend/index.js
+require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
+const mongoose = require('mongoose');
 
 const app = express();
+
+// Middlewares
 app.use(cors());
 app.use(express.json());
 
-app.get('/', (req, res) => {
-  res.send('Backend funcionando');
-});
+// Arranque + conexión a MongoDB
+async function start() {
+  try {
+    // Mongoose 7 no requiere opciones extra
+    await mongoose.connect(process.env.MONGO_URI);
+    console.log('✅ Conectado a MongoDB');
 
-// Aquí se agregarán futuras rutas para autenticación, profesores, cursos, recomendaciones y moderación
+    // Rutas (importa después de crear app)
+    const userRoutes = require('./routes/UserRoutes'); // ojo con mayúsculas/minúsculas
+    app.use('/api', userRoutes);
 
-const PORT = process.env.PORT || 4000;
-app.listen(PORT, () => {
-  console.log(`Servidor backend escuchando en puerto ${PORT}`);
-});
+    // Health check
+    app.get('/', (_req, res) => res.send('Backend funcionando'));
+
+    const PORT = process.env.PORT || 4000;
+    app.listen(PORT, () => {
+      console.log(`🚀 Servidor backend escuchando en puerto ${PORT}`);
+    });
+  } catch (err) {
+    console.error('❌ Error de conexión a MongoDB:', err.message);
+    process.exit(1);
+  }
+}
+
+start();

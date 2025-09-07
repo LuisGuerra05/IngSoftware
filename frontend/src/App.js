@@ -1,12 +1,9 @@
 import React from 'react';
+import Login from './pages/Login';
 
 function App() {
-  return (
-    <div>
-      <h1>Frontend funcionando</h1>
-      {/* Aquí se agregarán vistas para autenticación, búsqueda, perfiles y formularios de evaluación */}
-    </div>
-  );
+  // Por ahora, siempre muestra el login
+  return <Login />;
 }
 
 export default App;

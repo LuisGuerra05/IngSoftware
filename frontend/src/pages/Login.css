@@ -1,0 +1,91 @@
+/* Bloquea el scroll de la vista */
+html, body, #root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  overflow: hidden; /* sin scroll */
+}
+
+/* Fondo fijado al viewport (no se mueve) */
+.login-bg {
+  position: fixed;         /* ocupa todo el viewport y queda inmóvil */
+  inset: 0;                /* top/right/bottom/left = 0 */
+  background: url('/public/img/FondoLogin.jpg') center/cover no-repeat;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Recuadro blanco centrado */
+.login-container {
+  background: rgba(255,255,255,0.97);
+  border-radius: 16px;
+  box-shadow: 0 4px 32px rgba(0,0,0,0.15);
+  padding: 40px 32px 24px 32px;
+  max-width: 350px;
+  width: 100%;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.login-logo img {
+  margin-bottom: 10px;
+}
+
+.login-logo h2 {
+  font-size: 1.2rem;
+  font-weight: bold;
+  margin: 0 0 8px 0;
+}
+
+.login-logo p {
+  margin-bottom: 18px;
+  color: #333;
+}
+
+.login-form {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.login-input {
+  padding: 10px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  font-size: 1rem;
+}
+
+.login-btn {
+  background: #005fa3;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 10px;
+  font-size: 1rem;
+  cursor: pointer;
+  font-weight: bold;
+  margin-top: 8px;
+  transition: background 0.2s;
+}
+
+.login-btn:hover {
+  background: #003e6b;
+}
+
+.login-footer {
+  margin-top: 18px;
+  font-size: 0.95rem;
+  color: #666;
+}
+
+/* (Opcional) en pantallas muy bajas, permite scroll para no cortar el formulario */
+@media (max-height: 540px) {
+  body { overflow: auto; }
+  .login-bg { position: static; min-height: 100vh; }
+}

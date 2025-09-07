@@ -1,8 +1,20 @@
 const mongoose = require('mongoose');
+const bcrypt = require('bcryptjs');
 
-const userSchema = new mongoose.Schema({
-  email: { type: String, required: true },
-  password: { type: String, required: true }
-});
+const UserSchema = new mongoose.Schema(
+  {
+    email: { type: String, required: true, unique: true, index: true, lowercase: true, trim: true },
+    passwordHash: { type: String, required: true }
+  },
+  { timestamps: true }
+);
 
-module.exports = mongoose.model('User', userSchema);
+UserSchema.statics.hashPassword = async function (plain, pepper, saltRounds = 12) {
+  return bcrypt.hash(String(plain || '') + String(pepper || ''), saltRounds);
+};
+
+UserSchema.methods.verifyPassword = async function (plain, pepper) {
+  return bcrypt.compare(String(plain || '') + String(pepper || ''), this.passwordHash);
+};
+
+module.exports = mongoose.model('User', UserSchema);

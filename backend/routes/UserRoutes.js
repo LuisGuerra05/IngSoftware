@@ -1,20 +1,15 @@
-// backend/routes/UserRoutes.js
 const express = require('express');
+const jwt = require('jsonwebtoken');
 const router = express.Router();
-const User = require('../models/User'); // Asegúrate de tener este modelo
+const User = require('../models/User');
+const requireAuth = require('../middleware/requireAuth');
 
-// Regex para permitir solo alumnos UAI en el prototipo
 const UAI_STUDENT_REGEX = /^[a-z0-9._%+-]+@alumnos\.uai\.cl$/i;
 
-/**
- * Ruta de prueba para crear usuario
- * POST /api/test-user
- * Body: { email, password }
- */
-router.post('/test-user', async (req, res) => {
+// LOGIN -> emite JWT
+router.post('/login', async (req, res) => {
   try {
     const { email, password } = req.body || {};
-
     if (!email || !password) {
       return res.status(400).json({ error: 'email y password son requeridos' });
     }
@@ -22,30 +17,26 @@ router.post('/test-user', async (req, res) => {
       return res.status(400).json({ error: 'Solo correos @alumnos.uai.cl' });
     }
 
-    const newUser = new User({ email, password });
-    await newUser.save();
+    const user = await User.findOne({ email: email.toLowerCase() });
+    if (!user) {
+      return res.status(401).json({ error: 'Correo o contraseña incorrecta' });
+    }
 
-    return res.status(201).json({
-      message: 'Usuario creado',
-      user: { id: newUser._id, email: newUser.email },
-    });
-  } catch (err) {
-    console.error('Error al crear usuario:', err);
-    return res.status(500).json({ error: 'Error al crear usuario' });
-  }
-});
+    const ok = await user.verifyPassword(password, process.env.PEPPER || '');
+    if (!ok) {
+      return res.status(401).json({ error: 'Correo o contraseña incorrecta' });
+    }
 
-/**
- * (Opcional) Lista usuarios para probar
- * GET /api/users
- */
-router.get('/users', async (_req, res) => {
-  try {
-    const users = await User.find({}, { email: 1 }).lean();
-    return res.json(users);
+    const token = require('jsonwebtoken').sign(
+      { sub: String(user._id), email: user.email },
+      process.env.JWT_SECRET,
+      { expiresIn: process.env.JWT_EXPIRES_IN || '2h' }
+    );
+
+    return res.json({ ok: true, token, user: { id: user._id, email: user.email } });
   } catch (err) {
-    console.error('Error al listar usuarios:', err);
-    return res.status(500).json({ error: 'Error al listar usuarios' });
+    console.error('Error en login:', err);
+    return res.status(500).json({ error: 'Error en login' });
   }
 });
 

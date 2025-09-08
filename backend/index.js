@@ -14,8 +14,9 @@ app.use(express.json());
 async function start() {
   try {
     // Mongoose 7 no requiere opciones extra
-    await mongoose.connect(process.env.MONGO_URI);
-    console.log('✅ Conectado a MongoDB');
+    await mongoose.connect(process.env.MONGO_URI, { dbName: 'ingsoftware' });
+    console.log('✅ Conectado a MongoDB. DB =', mongoose.connection.name);
+
 
     // Rutas (importa después de crear app)
     const userRoutes = require('./routes/UserRoutes'); // ojo con mayúsculas/minúsculas

@@ -24,7 +24,7 @@ body {
   border-radius: 16px;
   box-shadow: 0 4px 32px rgba(0,0,0,0.15);
   padding: 40px 32px 24px 32px;
-  max-width: 350px;
+  max-width: 400px;
   width: 100%;
   text-align: center;
   display: flex;
@@ -93,4 +93,33 @@ body {
 @media (max-height: 540px) {
   body { overflow: auto; }
   .login-bg { position: static; min-height: 100vh; }
+}
+
+.login-logo {
+  text-align: center;
+}
+
+.login-logo-img {
+  width: 200px;
+  display: block;
+  margin: 0 auto;          /* centra */
+}
+
+.logo-caption {
+  margin-top: 2px;         /* antes: 6–10px */
+  margin-bottom: 10px;
+  font-size: 0.85rem;
+  line-height: 1.1;
+  color: #6b7280;
+  font-weight: 500;
+}
+
+/* Opcional: si quieres aún más cerca, usa 0px o un margen negativo pequeño */
+.logo-caption.tight {
+  margin-top: -20px;        /* pega más el texto al logo */
+}
+
+/* Para evitar que el H2 empuje hacia arriba */
+.login-logo h2 {
+  margin-top: 8px;         /* reduce si lo ves muy pegado */
 }

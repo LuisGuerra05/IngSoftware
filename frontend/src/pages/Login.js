@@ -60,8 +60,16 @@ function Login() {
     <div className="login-bg">
       <div className="login-container">
         <div className="login-logo">
-          <img src="/img/Logo.jpg" alt="Logo Plataforma" style={{ width: '120px', marginBottom: '10px' }} />
-          <h2>PLATAFORMA ACADÉMICA<br />PREGRADO</h2>
+          <img
+            src="/img/Logo.png"
+            alt="Logo Plataforma"
+            style={{ width: '200px', marginBottom: '1px' }}
+          />
+
+          {/* NUEVO: subtítulo pequeño bajo el logo */}
+          <div className="logo-caption tight">Calificador de Profesores</div>
+
+          <h2>PLATAFORMA ACADÉMICA</h2>
           <p>Ingrese con su correo UAI</p>
         </div>
 

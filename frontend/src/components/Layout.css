@@ -1,0 +1,31 @@
+html, body, #root {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+/* Contenedor vertical que maneja toda la página */
+.layout-wrapper {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh; /* 👈 asegura que todo ocupe el alto completo */
+}
+
+/* Fondo con cubos */
+.layout-bg {
+  flex: 1; /* 👈 ocupa todo el espacio entre navbar y footer */
+  background-image:
+    url("https://www.transparenttextures.com/patterns/cubes.png"),
+    linear-gradient(120deg, #ffffff 0%, #f9fafb 100%);
+  background-repeat: repeat;
+  background-blend-mode: multiply;
+}
+
+/* Contenido central */
+.page-content {
+  flex: 1;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 120px 20px 80px 20px; /* deja espacio para navbar fija */
+  box-sizing: border-box;
+}

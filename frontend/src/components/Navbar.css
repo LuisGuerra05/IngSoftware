@@ -5,80 +5,69 @@
   background: rgba(255, 255, 255, 0.9);
   backdrop-filter: blur(6px);
   border-bottom: 1px solid #e5e7eb;
+  transition: top 0.4s ease-in-out;
 }
 
-.navbar__inner {
-  max-width: 1120px;
-  margin: 0 auto;
-  padding: 12px 16px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
+/* Animación del hide/show al hacer scroll */
+.navbar-hide {
+  top: -80px;
+}
+.navbar-show {
+  top: 0;
 }
 
-.navbar__brand {
-  display: flex;
-  align-items: center;
-  gap: 8px;
+/* 🔹 Logo principal */
+.navbar-logo {
+  height: 110px; /* 👈 tamaño del logo más grande */
+  width: auto;
+  margin-right: 12px;
+  transition: transform 0.25s ease;
 }
 
-.navbar__logo {
-  width: 28px;
-  height: 28px;
-  background: #111;
-  border-radius: 8px;
+.navbar-logo:hover {
+  transform: scale(1.05); /* 👈 pequeño efecto hover elegante */
 }
 
-.navbar__title {
+
+/* 🔹 Enlaces */
+.navbar .nav-link {
+  color: #111;
+  font-weight: 500;
+  font-size: 0.95rem;
+  padding: 8px 12px;
+}
+
+.navbar .nav-link:hover {
+  background: #f3f4f6;
+  border-radius: 10px;
+}
+
+.navbar .nav-link.active {
   font-weight: 600;
 }
 
-.navbar__links {
-  display: none;
-  gap: 8px;
-}
-@media (min-width: 768px) {
-  .navbar__links { display: flex; }
-}
-
-.link {
-  padding: 8px 12px;
-  border-radius: 10px;
-  text-decoration: none;
-  color: #111;
-  border: 1px solid transparent;
-}
-.link:hover { background: #f3f4f6; }
-.link--ghost { border-color: #e5e7eb; }
-
-.navbar__auth {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.user {
-  font-size: 14px;
-  color: #4b5563;
-}
-
-.btn {
-  padding: 10px 14px;
-  border-radius: 12px;
+/* 🔹 Perfil */
+.navbar .person-icon {
   cursor: pointer;
-  border: 1px solid #d1d5db;
-  background: #fff;
-  color: #111;
-  text-decoration: none;
-  display: inline-block;
+  color: #000000;
 }
 
-.btn--solid {
-  background: #111;
-  color: #fff;
-  border-color: #111;
+/* 🔹 Responsive */
+@media (max-width: 768px) {
+  .navbar-logo {
+    height: 60px; /* un poco más pequeño en móviles */
+  }
 }
-.btn--solid:hover { background: #000; }
 
-.btn--outline:hover { background: #f9fafb; }
+.btn-logout {
+  background-color: #111 !important;
+  border-color: #111 !important;
+  color: #fff !important;
+  border-radius: 10px;
+  padding: 10px 14px;
+  transition: background-color 0.2s ease;
+}
+
+.btn-logout:hover {
+  background-color: #000 !important;
+}

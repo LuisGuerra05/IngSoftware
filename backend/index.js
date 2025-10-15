@@ -8,6 +8,8 @@ const fs = require('fs');
 
 // --- Rutas ---
 const userRoutes = require('./routes/UserRoutes');
+const profesorRoutes = require('./routes/ProfesorRoutes');
+const cursoRoutes = require('./routes/CursoRoutes');
 
 // --- Variables de entorno ---
 const { MONGO_URI, DB_NAME } = process.env;
@@ -19,6 +21,8 @@ app.use(express.json());
 
 // --- Rutas API ---
 app.use('/api', userRoutes);
+app.use('/api/profesores', profesorRoutes);
+app.use('/api/cursos', cursoRoutes);
 
 // --- Servir frontend (React build) ---
 const localFrontendPath = path.join(__dirname, '..', 'frontend', 'build');  // entorno local

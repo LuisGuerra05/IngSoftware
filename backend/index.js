@@ -1,38 +1,59 @@
-// backend/index.js
+// --- Configuración inicial ---
 require('dotenv').config();
 const express = require('express');
-const cors = require('cors');
 const mongoose = require('mongoose');
+const cors = require('cors');
+const path = require('path');
+const fs = require('fs');
 
+// --- Rutas ---
+const userRoutes = require('./routes/UserRoutes');
+
+// --- Variables de entorno ---
+const { MONGO_URI, DB_NAME } = process.env;
+
+// --- Inicializar Express ---
 const app = express();
-
-// Middlewares
 app.use(cors());
 app.use(express.json());
 
-// Arranque + conexión a MongoDB
-async function start() {
-  try {
-    // Mongoose 7 no requiere opciones extra
-    await mongoose.connect(process.env.MONGO_URI, { dbName: 'ingsoftware' });
-    console.log('✅ Conectado a MongoDB. DB =', mongoose.connection.name);
+// --- Rutas API ---
+app.use('/api', userRoutes);
 
+// --- Servir frontend (React build) ---
+const localFrontendPath = path.join(__dirname, '..', 'frontend', 'build');  // entorno local
+const deployedFrontendPath = path.join(__dirname, 'frontend', 'build');     // entorno Azure
 
-    // Rutas (importa después de crear app)
-    const userRoutes = require('./routes/UserRoutes'); // ojo con mayúsculas/minúsculas
-    app.use('/api', userRoutes);
+// Detectar cuál usar
+const frontendPath = fs.existsSync(deployedFrontendPath)
+  ? deployedFrontendPath
+  : localFrontendPath;
 
-    // Health check
-    app.get('/', (_req, res) => res.send('Backend funcionando'));
+// Servir archivos estáticos del frontend
+app.use(express.static(frontendPath));
+
+// Catch-all para rutas que no sean /api
+app.get(/^(?!\/api).*/, (req, res) => {
+  res.sendFile(path.join(frontendPath, 'index.html'));
+});
+
+// --- Conexión a MongoDB y arranque ---
+mongoose.connect(MONGO_URI, { dbName: DB_NAME || 'ingsoftware' })
+  .then(() => {
+    const dbName = mongoose.connection.name;
+    console.log(`✅ Conectado a MongoDB: ${dbName}`);
+
+    if (dbName === 'test') {
+      console.error("⚠️ La conexión apunta a 'test'. Ajusta MONGO_URI o DB_NAME.");
+      process.exit(1);
+    }
 
     const PORT = process.env.PORT || 4000;
     app.listen(PORT, () => {
       console.log(`🚀 Servidor backend escuchando en puerto ${PORT}`);
     });
-  } catch (err) {
+  })
+  .catch(err => {
     console.error('❌ Error de conexión a MongoDB:', err.message);
     process.exit(1);
-  }
-}
-
-start();
+  });

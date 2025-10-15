@@ -1,4 +1,4 @@
-import axios from "./api/axiosInstance";
+import axios from "./axiosInstance";
 
 // --- Autenticación ---
 export async function login(email, password) {

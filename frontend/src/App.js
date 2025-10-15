@@ -3,14 +3,16 @@ import { Routes, Route, Navigate } from "react-router-dom";
 import ProtectedRoute from "./ProtectedRoute";
 import Login from "./pages/Login";
 import Home from "./pages/Home";
+import Profesores from "./pages/Profesores";
+import Asignaturas from "./pages/Asignaturas";
 import Layout from "./components/Layout";
 import "./App.css";
-
 
 export default function App() {
   return (
     <Routes>
       <Route path="/login" element={<Login />} />
+
       <Route
         path="/"
         element={
@@ -21,6 +23,29 @@ export default function App() {
           </ProtectedRoute>
         }
       />
+
+      <Route
+        path="/profesores"
+        element={
+          <ProtectedRoute>
+            <Layout>
+              <Profesores />
+            </Layout>
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/asignaturas"
+        element={
+          <ProtectedRoute>
+            <Layout>
+              <Asignaturas />
+            </Layout>
+          </ProtectedRoute>
+        }
+      />
+
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );

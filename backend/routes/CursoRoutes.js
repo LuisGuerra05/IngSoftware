@@ -14,22 +14,33 @@ router.post('/', async (req, res) => {
   }
 });
 
-// Obtener todos los cursos
+// Obtener todos los cursos (con profesor como array)
 router.get('/', async (_req, res) => {
   try {
     const cursos = await Curso.find().populate('profesor');
-    res.json(cursos);
+    const cursosConProfesores = cursos.map((curso) => ({
+      _id: curso._id,
+      nombre: curso.nombre,
+      codigo: curso.codigo,
+      profesores: curso.profesor ? [curso.profesor] : [],
+    }));
+    res.json(cursosConProfesores);
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
 });
 
-// Obtener curso por ID
+// Obtener curso por ID (manteniendo estructura coherente)
 router.get('/:id', async (req, res) => {
   try {
     const curso = await Curso.findById(req.params.id).populate('profesor');
     if (!curso) return res.status(404).json({ message: 'Curso no encontrado' });
-    res.json(curso);
+    res.json({
+      _id: curso._id,
+      nombre: curso.nombre,
+      codigo: curso.codigo,
+      profesores: curso.profesor ? [curso.profesor] : [],
+    });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }

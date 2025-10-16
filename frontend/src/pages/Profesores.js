@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { getProfesores } from "../api/api";
 import { Card, Container, Row, Col, Spinner } from "react-bootstrap";
+import "./Profesores.css";
 
 export default function Profesores() {
   const [profesores, setProfesores] = useState([]);
@@ -24,8 +25,9 @@ export default function Profesores() {
   console.log("📊 Estado actual de profesores:", profesores);
 
   return (
-    <Container style={{ marginTop: 100 }}>
-      <h2 className="mb-4 fw-bold">Profesores</h2>
+    <div className="profesores-page">
+      <Container style={{ marginTop: 100 }}>
+        <h2 className="mb-4 fw-bold">Profesores</h2>
 
       {loading ? (
         <div className="text-center mt-5">
@@ -64,5 +66,6 @@ export default function Profesores() {
         </Row>
       )}
     </Container>
+    </div>
   );
 }

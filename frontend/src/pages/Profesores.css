@@ -1,0 +1,359 @@
+/* ===== Estilos para la página de Profesores - Responsive Optimizado ===== */
+
+/* Asegurar que el scroll funcione en la página de profesores */
+.profesores-page {
+  min-height: 100vh;
+  overflow-y: auto;
+}
+
+/* Forzar scroll cuando esta página está activa */
+body:has(.profesores-page) {
+  overflow: auto !important; /* Sobrescribe el overflow: hidden del Login */
+  height: auto !important;
+}
+
+/* Fallback para navegadores que no soportan :has() */
+html, body {
+  overflow: auto !important;
+  height: auto !important;
+}
+
+/* Base styles específicos para profesores */
+.profesores-page * {
+  box-sizing: border-box;
+}
+
+/* Contenedor principal optimizado */
+.profesores-page .container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding-left: 15px;
+  padding-right: 15px;
+  padding-bottom: 100px; /* Espacio adicional al final para scroll completo */
+  min-height: calc(100vh - 100px); /* Asegurar altura mínima */
+}
+
+/* Título principal responsivo */
+h2.mb-4.fw-bold {
+  font-size: clamp(1.8rem, 4vw, 2.5rem);
+  color: #111;
+  text-align: center;
+  position: relative;
+  margin-bottom: 2.5rem !important;
+  word-wrap: break-word;
+}
+
+h2.mb-4.fw-bold::after {
+  content: '';
+  display: block;
+  width: min(60px, 15vw);
+  height: 3px;
+  background: linear-gradient(90deg, #005fa3, #111);
+  margin: 15px auto 0;
+  border-radius: 2px;
+}
+
+/* Spinner responsive */
+.text-center.mt-5 .spinner-border {
+  color: #005fa3 !important;
+  width: clamp(2rem, 8vw, 3rem);
+  height: clamp(2rem, 8vw, 3rem);
+  border-width: 0.3em;
+}
+
+.text-center.mt-5 {
+  min-height: 300px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Grid responsive mejorado */
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  margin-left: -15px;
+  margin-right: -15px;
+}
+
+.row .col-md-6.col-lg-4 {
+  padding-left: 15px;
+  padding-right: 15px;
+  margin-bottom: 2rem;
+  flex: 0 0 100%;
+  max-width: 100%;
+}
+
+/* Tarjetas responsivas */
+.card.shadow-sm.h-100 {
+  background: rgba(255, 255, 255, 0.95);
+  border: 1px solid #e5e7eb;
+  border-radius: 16px !important;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08) !important;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
+  animation: fadeInUp 0.6s ease forwards;
+  overflow: hidden;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.card.shadow-sm.h-100:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15) !important;
+  border-color: #005fa3;
+}
+
+/* Contenido de tarjetas flexible */
+.card-body {
+  padding: 1.5rem !important;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  flex-grow: 1;
+}
+
+.card-title {
+  font-size: clamp(1.1rem, 3vw, 1.4rem) !important;
+  font-weight: 600 !important;
+  color: #111 !important;
+  margin-bottom: 0.75rem !important;
+  line-height: 1.3;
+  border-bottom: 2px solid #f3f4f6;
+  padding-bottom: 0.75rem;
+  word-wrap: break-word;
+  hyphens: auto;
+}
+
+.card-subtitle {
+  font-size: clamp(0.8rem, 2.5vw, 0.95rem) !important;
+  font-weight: 500 !important;
+  background: #f3f4f6 !important;
+  color: #6b7280 !important;
+  padding: 6px 12px !important;
+  border-radius: 20px !important;
+  display: inline-block !important;
+  width: fit-content !important;
+  margin-bottom: 1rem !important;
+  word-wrap: break-word;
+}
+
+/* Sección de cursos flexible */
+.card-text {
+  flex: 1;
+  margin-bottom: 1.5rem !important;
+  background: #f9fafb;
+  padding: 12px;
+  border-radius: 8px;
+  border-left: 4px solid #005fa3;
+  line-height: 1.5;
+  color: #4b5563;
+  font-size: clamp(0.8rem, 2.5vw, 0.95rem);
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+
+.card-text strong {
+  font-weight: 600;
+  color: #374151;
+  font-size: clamp(0.75rem, 2vw, 0.9rem);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+/* Botón responsive */
+.btn.btn-outline-dark.btn-sm {
+  background: linear-gradient(135deg, #005fa3, #003e6b) !important;
+  color: #fff !important;
+  border: none !important;
+  border-radius: 10px !important;
+  padding: clamp(8px, 2vw, 12px) clamp(14px, 3vw, 20px) !important;
+  font-size: clamp(0.75rem, 2vw, 0.9rem) !important;
+  font-weight: 500 !important;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all 0.3s ease;
+  text-align: center;
+  margin-top: auto;
+  width: 100%;
+  min-height: 44px; /* Área táctil mínima */
+}
+
+.btn.btn-outline-dark.btn-sm:hover {
+  background: linear-gradient(135deg, #003e6b, #002a4a) !important;
+  color: #fff !important;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(0, 95, 163, 0.3) !important;
+  text-decoration: none;
+}
+
+.btn.btn-outline-dark.btn-sm::after {
+  content: '↗';
+  font-size: 1.1rem;
+  margin-left: 4px;
+}
+
+/* Estado vacío responsive */
+p.text-center.text-muted.mt-5 {
+  font-size: clamp(1rem, 3vw, 1.2rem) !important;
+  padding: clamp(2rem, 5vw, 4rem) clamp(1rem, 3vw, 2rem) !important;
+  color: #6b7280 !important;
+  background: linear-gradient(135deg, #f9fafb, #f3f4f6);
+  border-radius: 16px;
+  border: 2px dashed #d1d5db;
+  margin: 2rem 1rem !important;
+  position: relative;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
+  word-wrap: break-word;
+}
+
+p.text-center.text-muted.mt-5::before {
+  content: '👥';
+  font-size: clamp(2rem, 6vw, 3rem);
+  display: block;
+  margin-bottom: 1rem;
+}
+
+p.text-center.text-muted.mt-5::after {
+  content: 'Intenta recargar la página o verifica la conexión con el servidor.';
+  display: block;
+  font-size: clamp(0.8rem, 2vw, 0.9rem);
+  color: #9ca3af;
+  margin-top: 0.5rem;
+  font-style: italic;
+}
+
+/* Animaciones */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Delay escalonado */
+.col-md-6.col-lg-4:nth-child(1) .card { animation-delay: 0.1s; }
+.col-md-6.col-lg-4:nth-child(2) .card { animation-delay: 0.2s; }
+.col-md-6.col-lg-4:nth-child(3) .card { animation-delay: 0.3s; }
+.col-md-6.col-lg-4:nth-child(4) .card { animation-delay: 0.4s; }
+.col-md-6.col-lg-4:nth-child(5) .card { animation-delay: 0.5s; }
+.col-md-6.col-lg-4:nth-child(6) .card { animation-delay: 0.6s; }
+
+/* RESPONSIVE BREAKPOINTS */
+
+/* Tablets pequeñas y móviles grandes (768px+) */
+@media (min-width: 768px) {
+  .row .col-md-6.col-lg-4 {
+    flex: 0 0 50%;
+    max-width: 50%;
+  }
+  
+  .row {
+    margin-left: -12px;
+    margin-right: -12px;
+  }
+  
+  .row .col-md-6.col-lg-4 {
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+}
+
+/* Laptops y pantallas medianas (992px+) */
+@media (min-width: 992px) {
+  .row .col-md-6.col-lg-4 {
+    flex: 0 0 33.333333%;
+    max-width: 33.333333%;
+  }
+  
+  .container {
+    max-width: 960px;
+  }
+}
+
+/* Pantallas grandes (1200px+) */
+@media (min-width: 1200px) {
+  .container {
+    max-width: 1140px;
+  }
+}
+
+/* Pantallas extra grandes (1400px+) */
+@media (min-width: 1400px) {
+  .container {
+    max-width: 1320px;
+  }
+}
+
+/* Móviles pequeños (menos de 576px) */
+@media (max-width: 576px) {
+  .container {
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+  
+  .row {
+    margin-left: -5px;
+    margin-right: -5px;
+  }
+  
+  .row .col-md-6.col-lg-4 {
+    padding-left: 5px;
+    padding-right: 5px;
+    margin-bottom: 1.5rem;
+  }
+  
+  .card-body {
+    padding: 1rem !important;
+  }
+}
+
+/* Móviles muy pequeños (menos de 400px) */
+@media (max-width: 400px) {
+  .container {
+    padding-left: 8px;
+    padding-right: 8px;
+  }
+  
+  .row .col-md-6.col-lg-4 {
+    margin-bottom: 1rem;
+  }
+  
+  .card-body {
+    padding: 0.75rem !important;
+  }
+}
+
+/* Accesibilidad */
+.card.shadow-sm.h-100:focus-within {
+  outline: 2px solid #005fa3;
+  outline-offset: 2px;
+}
+
+.btn.btn-outline-dark.btn-sm:focus {
+  outline: 2px solid #005fa3;
+  outline-offset: 2px;
+  box-shadow: 0 0 0 3px rgba(0, 95, 163, 0.2) !important;
+}
+
+/* Hover para dispositivos no táctiles */
+@media (hover: hover) and (pointer: fine) {
+  .card.shadow-sm.h-100:hover {
+    transform: translateY(-5px);
+  }
+  
+  .btn.btn-outline-dark.btn-sm:hover {
+    transform: translateY(-2px);
+  }
+}

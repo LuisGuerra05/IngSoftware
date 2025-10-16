@@ -48,18 +48,30 @@
   padding: 6px 12px;
   border-radius: 20px;
   font-size: 0.9rem;
-  margin-bottom: 1rem;
+  margin-bottom: 1.2rem;
 }
 
-/* Enlace UAI */
-.detalle-profe-link a {
+/* ==== Perfil UAI box ==== */
+.perfil-uai-box {
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  padding: 10px 14px;
+  display: flex;
+  align-items: center;
+  color: #111;
+  font-size: 0.95rem;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.03);
+  margin-bottom: 1.5rem;
+}
+
+.perfil-uai-box a {
   color: #005fa3;
   font-weight: 500;
   text-decoration: none;
-  transition: color 0.3s ease;
 }
 
-.detalle-profe-link a:hover {
+.perfil-uai-box a:hover {
   color: #003e6b;
   text-decoration: underline;
 }
@@ -131,23 +143,6 @@
   padding-left: 2rem;
 }
 
-.stats-placeholder {
-  background: #f9fafb;
-  border: 2px dashed #d1d5db;
-  border-radius: 14px;
-  padding: 3rem 1rem;
-  text-align: center;
-  color: #6b7280;
-  font-size: 0.95rem;
-  box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.03);
-  transition: all 0.3s ease;
-}
-
-.stats-placeholder:hover {
-  border-color: #005fa3;
-  background: #f3f8fc;
-}
-
 /* Animación */
 @keyframes fadeInUp {
   from {
@@ -173,8 +168,5 @@
   .detalle-profe-stats {
     padding-left: 0;
   }
-
-  .stats-placeholder {
-    padding: 2rem 1rem;
-  }
 }
+

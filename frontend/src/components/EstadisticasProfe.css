@@ -1,0 +1,155 @@
+/* ===== CARD PRINCIPAL DE ESTADÍSTICAS ===== */
+.estadisticas-card {
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 16px;
+  box-shadow: 0 6px 18px rgba(0, 95, 163, 0.08);
+  padding: 1.8rem 2rem;
+  animation: fadeInUp 0.4s ease forwards;
+  transition: all 0.3s ease;
+}
+
+.estadisticas-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 24px rgba(0, 95, 163, 0.15);
+}
+
+/* Título */
+.estadisticas-titulo {
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: #111;
+  margin-bottom: 1rem;
+  position: relative;
+}
+
+.estadisticas-titulo::after {
+  content: "";
+  display: block;
+  width: 60px;
+  height: 3px;
+  background: linear-gradient(90deg, #005fa3, #003e6b);
+  border-radius: 2px;
+  margin-top: 6px;
+}
+
+/* ===== PROMEDIOS POR CATEGORÍA ===== */
+.categorias-container {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 1.8rem;
+}
+
+.categoria-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-left: 4px solid #005fa3;
+  border-radius: 10px;
+  padding: 10px 14px;
+  transition: all 0.25s ease;
+}
+
+.categoria-item:hover {
+  background: #f3f8fc;
+  border-color: #003e6b;
+  transform: translateX(3px);
+}
+
+.categoria-nombre {
+  color: #111;
+  font-weight: 500;
+  font-size: 0.95rem;
+}
+
+.categoria-estrellas {
+  color: #fbbf24; /* amarillo dorado */
+  font-size: 1.1rem;
+  display: flex;
+  align-items: center;
+  gap: 3px;
+}
+
+/* ===== COMENTARIOS ===== */
+.comentarios-titulo {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #111;
+  margin-bottom: 0.8rem;
+}
+
+.comentarios-lista {
+  max-height: 180px;
+  overflow-y: auto;
+  padding-right: 5px;
+  scrollbar-width: thin;
+  scrollbar-color: #005fa3 #f3f4f6;
+}
+
+.comentarios-lista::-webkit-scrollbar {
+  width: 6px;
+}
+
+.comentarios-lista::-webkit-scrollbar-thumb {
+  background-color: #005fa3;
+  border-radius: 6px;
+}
+
+.comentario-item {
+  background-color: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-left: 4px solid #005fa3;
+  border-radius: 10px;
+  padding: 10px 14px;
+  margin-bottom: 8px;
+  font-size: 0.9rem;
+  color: #374151;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+  transition: all 0.25s ease;
+}
+
+.comentario-item:hover {
+  background: #f3f8fc;
+  transform: translateX(3px);
+  border-color: #003e6b;
+}
+
+/* Fecha de comentario */
+.comentario-fecha {
+  font-size: 0.8rem;
+  color: #6b7280;
+  margin-top: 2px;
+  text-align: right;
+}
+
+/* ===== ANIMACIÓN ===== */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(15px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 768px) {
+  .estadisticas-card {
+    padding: 1.2rem 1.3rem;
+  }
+
+  .categoria-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+  }
+
+  .comentarios-lista {
+    max-height: 220px;
+  }
+}

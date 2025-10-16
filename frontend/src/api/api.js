@@ -32,3 +32,9 @@ export async function getCursoById(id) {
   const { data } = await axios.get(`/cursos/${id}`);
   return data;
 }
+
+// --- Calificaciones ---
+export async function getCalificacionesByProfesor(id) {
+  const { data } = await axios.get(`/calificaciones/${id}`);
+  return data;
+}

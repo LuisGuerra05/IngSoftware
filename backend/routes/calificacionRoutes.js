@@ -1,15 +1,23 @@
-// routes/calificacionRoutes.js
 const express = require('express');
 const router = express.Router();
 const Calificacion = require('../models/Calificacion');
-const { authenticate } = require('../middleware/authenticate'); // tu middleware JWT
+const requireAuth = require('../middleware/requireAuth'); // ✅ middleware correcto
 
 // 📤 Crear una nueva calificación
-router.post('/', authenticate, async (req, res) => {
+router.post('/', requireAuth, async (req, res) => {
   try {
-    const { profesorId, claridadComunicacion, dominioContenido, motivacion, exigenciaCarga, disponibilidadApoyo, comentario } = req.body;
+    const {
+      profesorId,
+      claridadComunicacion,
+      dominioContenido,
+      motivacion,
+      exigenciaCarga,
+      disponibilidadApoyo,
+      comentario,
+    } = req.body;
 
-    const estudianteId = req.user.id; // desde el token JWT
+    // ⚙️ Extraer el id del usuario autenticado desde el token
+    const estudianteId = req.user.sub || req.user.id; // depende de cómo lo generas en login
 
     // Verificar si ya calificó a este profesor
     const existente = await Calificacion.findOne({ profesorId, estudianteId });
@@ -17,6 +25,7 @@ router.post('/', authenticate, async (req, res) => {
       return res.status(400).json({ message: 'Ya has calificado a este profesor.' });
     }
 
+    // Crear la nueva calificación
     const calificacion = new Calificacion({
       profesorId,
       estudianteId,
@@ -71,8 +80,8 @@ router.get('/:profesorId', async (req, res) => {
       promedios,
       totalResenas: total,
       comentarios: calificaciones
-        .filter(c => c.comentario)
-        .map(c => ({
+        .filter((c) => c.comentario)
+        .map((c) => ({
           comentario: c.comentario,
           fecha: c.createdAt,
         })),

@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { getProfesorById } from "../api/api";
 import { Container, Card, Spinner, Row, Col, Button } from "react-bootstrap";
+import EstadisticasProfe from "../components/EstadisticasProfe";
 import "./DetalleProfe.css";
 
 export default function DetalleProfe() {
@@ -79,14 +80,10 @@ export default function DetalleProfe() {
               </Link>
             </Col>
 
-            {/* Columna derecha: Placeholder para estadísticas */}
+            {/* Columna derecha: estadísticas de calificaciones */}
             <Col xs={12} md={6} className="detalle-profe-stats">
-              <h5 className="detalle-profe-subtitulo">Estadísticas</h5>
-              <div className="stats-placeholder">
-                <p className="text-muted mb-0">
-                  Próximamente: calificaciones, reseñas y análisis 📊
-                </p>
-              </div>
+              <h5 className="detalle-profe-subtitulo">Estadísticas y valoraciones</h5>
+              <EstadisticasProfe profesorId={id} />
             </Col>
           </Row>
         </Card>

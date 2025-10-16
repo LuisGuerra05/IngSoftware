@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Spinner, Card, Row, Col } from "react-bootstrap";
+import { Spinner, Card } from "react-bootstrap";
 import { getCalificacionesByProfesor } from "../api/api";
 import { StarFill, Star } from "react-bootstrap-icons";
 import "./EstadisticasProfe.css";
@@ -24,11 +24,14 @@ export default function EstadisticasProfe({ profesorId }) {
       </div>
     );
 
-  if (error)
-    return <p className="text-danger text-center">{error}</p>;
+  if (error) return <p className="text-danger text-center">{error}</p>;
 
   if (!stats || !stats.promedios)
-    return <p className="text-muted text-center">Aún no hay calificaciones registradas.</p>;
+    return (
+      <p className="text-muted text-center">
+        Aún no hay calificaciones registradas.
+      </p>
+    );
 
   const categorias = [
     { key: "claridadComunicacion", label: "Claridad y comunicación" },
@@ -43,9 +46,9 @@ export default function EstadisticasProfe({ profesorId }) {
     for (let i = 1; i <= 5; i++) {
       stars.push(
         i <= rating ? (
-          <StarFill key={i} color="#ffc107" />
+          <StarFill key={i} color="#fbbf24" />
         ) : (
-          <Star key={i} color="#ddd" />
+          <Star key={i} color="#d1d5db" />
         )
       );
     }
@@ -53,39 +56,41 @@ export default function EstadisticasProfe({ profesorId }) {
   };
 
   return (
-    <Card className="estadisticas-card shadow-sm">
+    <Card className="estadisticas-card">
       <Card.Body>
-        <h5 className="text-center mb-3">Valoraciones promedio</h5>
-        {categorias.map((cat) => (
-          <Row key={cat.key} className="align-items-center mb-2">
-            <Col xs={7}>
-              <span>{cat.label}</span>
-            </Col>
-            <Col xs={5} className="text-end">
-              {renderStars(Math.round(stats.promedios[cat.key]))}
-              <small className="text-muted ms-2">
-                {stats.promedios[cat.key]}/5
-              </small>
-            </Col>
-          </Row>
-        ))}
+        <h5 className="estadisticas-titulo">Valoraciones promedio</h5>
 
-        <hr />
+        <div className="categorias-container">
+          {categorias.map((cat) => {
+            const valor = Math.round(stats.promedios[cat.key]);
+            return (
+              <div key={cat.key} className="categoria-item">
+                <span className="categoria-nombre">{cat.label}</span>
+                <div className="categoria-estrellas">
+                  {renderStars(valor)}
+                  <span className="categoria-puntaje">{valor}/5</span>
+                </div>
+              </div>
+            );
+          })}
+        </div>
 
-        <h6 className="mt-3 text-center">Comentarios de estudiantes</h6>
+        <h6 className="comentarios-titulo text-center">
+          Comentarios de estudiantes
+        </h6>
         {stats.comentarios && stats.comentarios.length > 0 ? (
           <div className="comentarios-lista">
             {stats.comentarios.map((c, i) => (
               <div key={i} className="comentario-item">
                 <p className="mb-1">“{c.comentario}”</p>
-                <small className="text-muted">
+                <div className="comentario-fecha">
                   {new Date(c.fecha).toLocaleDateString("es-CL")}
-                </small>
+                </div>
               </div>
             ))}
           </div>
         ) : (
-          <p className="text-muted text-center">
+          <p className="text-muted text-center mb-0">
             No hay comentarios disponibles.
           </p>
         )}

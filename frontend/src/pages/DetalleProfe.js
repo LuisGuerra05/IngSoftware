@@ -44,9 +44,9 @@ export default function DetalleProfe() {
     <div className="detalle-profe-page">
       <Container>
         <Card className="detalle-profe-card shadow-sm">
-          <Row className="g-4">
+          <Row className="g-4 align-items-start">
             {/* Columna izquierda: información del profesor */}
-            <Col xs={12} md={6} className="detalle-profe-info">
+            <Col xs={12} md={5} className="detalle-profe-info">
               <h2 className="detalle-profe-nombre">{profesor.nombre}</h2>
               <span className="detalle-profe-campus">{profesor.campus}</span>
 
@@ -81,8 +81,10 @@ export default function DetalleProfe() {
             </Col>
 
             {/* Columna derecha: estadísticas de calificaciones */}
-            <Col xs={12} md={6} className="detalle-profe-stats">
-              <h5 className="detalle-profe-subtitulo">Estadísticas y valoraciones</h5>
+            <Col xs={12} md={7} className="detalle-profe-stats">
+              <h5 className="detalle-profe-subtitulo">
+                Estadísticas y valoraciones
+              </h5>
               <EstadisticasProfe profesorId={id} />
             </Col>
           </Row>

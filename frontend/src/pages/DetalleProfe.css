@@ -1,0 +1,180 @@
+/* ===== Página Detalle de Profesor ===== */
+.detalle-profe-page {
+  min-height: 100vh;
+  padding-bottom: 80px;
+}
+
+/* Contenedor */
+.detalle-profe-page .container {
+  margin-top: 100px;
+  max-width: 1100px;
+}
+
+/* Card principal */
+.detalle-profe-card {
+  background: rgba(255, 255, 255, 0.95);
+  border: 1px solid #e5e7eb;
+  border-radius: 18px;
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.08);
+  padding: 2.5rem;
+  transition: all 0.3s ease;
+  animation: fadeInUp 0.5s ease forwards;
+}
+
+.detalle-profe-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 32px rgba(0, 95, 163, 0.15);
+}
+
+/* Columna izquierda */
+.detalle-profe-info {
+  border-right: 2px solid #f3f4f6;
+  padding-right: 2rem;
+}
+
+/* Nombre */
+.detalle-profe-nombre {
+  font-size: clamp(1.6rem, 3vw, 2rem);
+  font-weight: 700;
+  color: #111;
+  margin-bottom: 0.5rem;
+}
+
+/* Campus */
+.detalle-profe-campus {
+  background: #f3f4f6;
+  color: #4b5563;
+  display: inline-block;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  margin-bottom: 1rem;
+}
+
+/* Enlace UAI */
+.detalle-profe-link a {
+  color: #005fa3;
+  font-weight: 500;
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+.detalle-profe-link a:hover {
+  color: #003e6b;
+  text-decoration: underline;
+}
+
+/* Subtítulo */
+.detalle-profe-subtitulo {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #111;
+  margin-top: 1.8rem;
+  margin-bottom: 1rem;
+  position: relative;
+}
+
+.detalle-profe-subtitulo::after {
+  content: "";
+  display: block;
+  width: 50px;
+  height: 3px;
+  background: linear-gradient(90deg, #005fa3, #111);
+  border-radius: 2px;
+  margin-top: 6px;
+}
+
+/* Lista de cursos */
+.detalle-profe-cursos {
+  list-style: none;
+  padding-left: 0;
+}
+
+.detalle-profe-cursos li {
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-left: 4px solid #005fa3;
+  border-radius: 8px;
+  padding: 10px 14px;
+  margin-bottom: 10px;
+  transition: all 0.25s ease;
+}
+
+.detalle-profe-cursos li:hover {
+  background: #f3f8fc;
+  border-color: #003e6b;
+  transform: translateX(3px);
+}
+
+/* Botón volver */
+.btn-volver {
+  background: linear-gradient(135deg, #005fa3, #003e6b) !important;
+  color: #fff !important;
+  border: none !important;
+  border-radius: 10px !important;
+  padding: 10px 28px !important;
+  font-weight: 500 !important;
+  transition: all 0.3s ease;
+}
+
+.btn-volver:hover {
+  background: linear-gradient(135deg, #003e6b, #002a4a) !important;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(0, 95, 163, 0.25);
+}
+
+/* Columna derecha: estadísticas */
+.detalle-profe-stats {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  padding-left: 2rem;
+}
+
+.stats-placeholder {
+  background: #f9fafb;
+  border: 2px dashed #d1d5db;
+  border-radius: 14px;
+  padding: 3rem 1rem;
+  text-align: center;
+  color: #6b7280;
+  font-size: 0.95rem;
+  box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.03);
+  transition: all 0.3s ease;
+}
+
+.stats-placeholder:hover {
+  border-color: #005fa3;
+  background: #f3f8fc;
+}
+
+/* Animación */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .detalle-profe-info {
+    border-right: none;
+    border-bottom: 2px solid #f3f4f6;
+    padding-right: 0;
+    padding-bottom: 2rem;
+    margin-bottom: 2rem;
+  }
+
+  .detalle-profe-stats {
+    padding-left: 0;
+  }
+
+  .stats-placeholder {
+    padding: 2rem 1rem;
+  }
+}

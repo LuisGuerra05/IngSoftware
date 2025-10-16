@@ -1,4 +1,4 @@
-/* Bloquea el scroll de la vista */
+/* ===== Bloquea el scroll de la vista ===== */
 html, body, #root {
   height: 100%;
 }
@@ -6,9 +6,11 @@ html, body, #root {
 body {
   margin: 0;
   overflow: hidden; /* sin scroll */
+  font-family: "Inter", "Segoe UI", sans-serif;
+  color: #111;
 }
 
-/* Fondo fijado al viewport (no se mueve) */
+/* ===== Fondo fijado al viewport (mantiene tu imagen) ===== */
 .login-bg {
   position: fixed;         /* ocupa todo el viewport y queda inmóvil */
   inset: 0;                /* top/right/bottom/left = 0 */
@@ -18,108 +20,180 @@ body {
   justify-content: center;
 }
 
-/* Recuadro blanco centrado */
+/* ===== Recuadro blanco centrado ===== */
 .login-container {
   background: rgba(255,255,255,0.97);
-  border-radius: 16px;
-  box-shadow: 0 4px 32px rgba(0,0,0,0.15);
-  padding: 40px 32px 24px 32px;
+  border-radius: 18px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+  padding: 40px 32px 28px 32px;
   max-width: 400px;
   width: 100%;
   text-align: center;
   display: flex;
   flex-direction: column;
   align-items: center;
+  animation: fadeInUp 0.6s ease; /* Animación suave de entrada */
+}
+
+/* ===== Logo y encabezado ===== */
+.login-logo {
+  text-align: center;
+}
+
+.login-logo img {
+  margin-bottom: 8px;
+  width: 180px;
+}
+
+.logo-caption {
+  margin-top: -16px;
+  margin-bottom: 12px;
+  font-size: 0.9rem;
+  color: #6b7280;
+  font-weight: 500;
+}
+
+.login-logo h2 {
+  font-size: 1.3rem;
+  font-weight: 700;
+  margin: 4px 0 6px 0;
+  color: #111;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.login-logo p {
+  margin-bottom: 22px;
+  color: #4b5563;
+  font-size: 0.95rem;
+}
+
+/* ===== Formulario ===== */
+.login-form {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
 }
 
 .login-container .form-label {
   text-align: left !important;
   display: block;
+  font-weight: 600;
+  color: #111;
+  font-size: 0.95rem;
+  margin-bottom: 6px;
 }
 
-.login-logo img {
-  margin-bottom: 10px;
+.form-control {
+  padding: 12px 14px;
+  border-radius: 10px;
+  border: 1px solid #d1d5db;
+  font-size: 0.95rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  transition: all 0.25s ease;
 }
 
-.login-logo h2 {
-  font-size: 1.2rem;
-  font-weight: bold;
-  margin: 0 0 8px 0;
+.form-control:focus {
+  border-color: #005fa3;
+  box-shadow: 0 0 0 3px rgba(0, 95, 163, 0.15);
 }
 
-.login-logo p {
-  margin-bottom: 18px;
-  color: #333;
-}
-
-.login-form {
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.login-input {
-  padding: 10px;
-  border-radius: 6px;
-  border: 1px solid #ccc;
-  font-size: 1rem;
-}
-
+/* ===== Botón (mismo estilo institucional) ===== */
 .login-btn {
-  background: #005fa3;
-  color: #fff;
-  border: none;
-  border-radius: 6px;
-  padding: 10px;
-  font-size: 1rem;
-  cursor: pointer;
-  font-weight: bold;
-  margin-top: 8px;
-  transition: background 0.2s;
+  background: linear-gradient(135deg, #005fa3, #003e6b) !important;
+  border: none !important;
+  border-radius: 10px !important;
+  padding: 12px 0 !important;
+  font-weight: 500 !important;
+  color: #fff !important;
+  letter-spacing: 0.3px;
+  transition: all 0.3s ease;
+  min-width: 120px;
+  box-shadow: 0 4px 16px rgba(0, 95, 163, 0.25);
 }
 
 .login-btn:hover {
-  background: #003e6b;
+  background: linear-gradient(135deg, #003e6b, #002a4a) !important;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 95, 163, 0.35);
 }
 
+.login-btn:active {
+  transform: translateY(0);
+  box-shadow: 0 3px 10px rgba(0, 95, 163, 0.2);
+}
+
+/* ===== Mensaje de error ===== */
+.alert-danger {
+  border-radius: 10px;
+  background: #fee2e2;
+  color: #b91c1c;
+  border: 1px solid #fecaca;
+  font-weight: 500;
+  font-size: 0.95rem;
+  text-align: center;
+}
+
+/* ===== Footer (si lo agregas después) ===== */
 .login-footer {
   margin-top: 18px;
   font-size: 0.95rem;
   color: #666;
 }
 
-/* (Opcional) en pantallas muy bajas, permite scroll para no cortar el formulario */
+/* ===== Animación de entrada ===== */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ===== Responsive ===== */
+@media (max-width: 576px) {
+  .login-container {
+    padding: 30px 22px;
+    border-radius: 14px;
+  }
+
+  .login-logo img {
+    width: 150px;
+  }
+
+  .login-logo h2 {
+    font-size: 1.1rem;
+  }
+
+  .login-logo p {
+    font-size: 0.9rem;
+  }
+}
+
+/* ===== Modo pantalla baja (scroll si es necesario) ===== */
 @media (max-height: 540px) {
-  body { overflow: auto; }
-  .login-bg { position: static; min-height: 100vh; }
+  body {
+    overflow: auto;
+  }
+  .login-bg {
+    position: static;
+    min-height: 100vh;
+  }
 }
 
-.login-logo {
-  text-align: center;
+/* Mantener color institucional incluso cuando el botón está deshabilitado */
+.login-btn:disabled,
+.login-btn:disabled:hover,
+.login-btn[disabled] {
+  background: linear-gradient(135deg, #005fa3, #003e6b) !important;
+  color: #fff !important;
+  opacity: 0.6; /* leve transparencia para mostrar que no se puede presionar */
+  cursor: not-allowed;
+  box-shadow: none !important;
+  transform: none !important;
 }
 
-.login-logo-img {
-  width: 200px;
-  display: block;
-  margin: 0 auto;          /* centra */
-}
-
-.logo-caption {
-  margin-top: 2px;         /* antes: 6–10px */
-  margin-bottom: 10px;
-  font-size: 0.85rem;
-  line-height: 1.1;
-  color: #6b7280;
-  font-weight: 500;
-}
-
-/* Opcional: si quieres aún más cerca, usa 0px o un margen negativo pequeño */
-.logo-caption.tight {
-  margin-top: -20px;        /* pega más el texto al logo */
-}
-
-/* Para evitar que el H2 empuje hacia arriba */
-.login-logo h2 {
-  margin-top: 8px;         /* reduce si lo ves muy pegado */
-}

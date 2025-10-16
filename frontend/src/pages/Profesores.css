@@ -357,3 +357,52 @@ p.text-center.text-muted.mt-5::after {
     transform: translateY(-2px);
   }
 }
+
+/* ===== Ajuste estético para las tarjetas de Asignaturas ===== */
+.card-text.asignatura-profes {
+  background: #f3f4f6;
+  border-radius: 10px;
+  border-left: 3px solid #005fa3;
+  padding: 8px 12px;
+  font-size: clamp(0.85rem, 2.5vw, 0.95rem);
+  color: #374151;
+  margin-bottom: 0.5rem !important;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-weight: 500;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+/* Estilo más refinado del número de profesores */
+.asignatura-profes .badge-count {
+  background: linear-gradient(135deg, #0070cc, #004b91);
+  color: #fff;
+  border-radius: 50px;
+  padding: 4px 12px;
+  font-weight: 600;
+  font-size: 0.85rem;
+  line-height: 1;
+  min-width: 26px;
+  text-align: center;
+  box-shadow: 0 2px 6px rgba(0, 95, 163, 0.25);
+  transition: all 0.25s ease;
+}
+
+/* Efecto visual al pasar el mouse sobre la tarjeta */
+.card:hover .asignatura-profes .badge-count {
+  background: linear-gradient(135deg, #004b91, #002f5c);
+  transform: scale(1.05);
+  box-shadow: 0 3px 10px rgba(0, 95, 163, 0.35);
+}
+
+.card-text.asignatura-profes {
+  padding: 10px 14px;
+  border-left: 3px solid #005fa3;
+  border-radius: 10px;
+  background: #f9fafb;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem !important;
+}

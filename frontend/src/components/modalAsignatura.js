@@ -1,51 +1,59 @@
 import React from "react";
 import { Modal, Button, ListGroup } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
+import "./ModalAsignatura.css";
 
 export default function ModalAsignatura({ show, handleClose, asignatura }) {
   const navigate = useNavigate();
-
-  if (!asignatura) return null; // si aún no hay asignatura seleccionada
+  if (!asignatura) return null;
 
   return (
-    <Modal show={show} onHide={handleClose} centered>
-      <Modal.Header closeButton>
-        <Modal.Title>{asignatura.nombre}</Modal.Title>
-      </Modal.Header>
+    <Modal
+      show={show}
+      onHide={handleClose}
+      centered
+      className="modal-asignatura"
+      backdrop={true}
+      keyboard={true}
+    >
+      <div className="modal-asignatura-header">
+        <Modal.Header closeButton closeVariant="white">
+          <Modal.Title>{asignatura.nombre}</Modal.Title>
+        </Modal.Header>
+      </div>
 
-      <Modal.Body>
-        <p>
+      <div className="modal-asignatura-body">
+        <p className="modal-info">
           <strong>Código:</strong> {asignatura.codigo}
         </p>
 
-        <p>
-          <strong>Profesores:</strong>
-        </p>
+        <h5 className="modal-subtitle">Profesores registrados</h5>
+
         {asignatura.profesores?.length ? (
-          <ListGroup>
+          <ListGroup variant="flush" className="profesores-list">
             {asignatura.profesores.map((prof) => (
               <ListGroup.Item
                 key={prof._id}
-                action
+                className="profesor-item"
                 onClick={() => {
                   handleClose();
                   navigate(`/detalle-profe/${prof._id}`);
                 }}
               >
-                {prof.nombre}
+                <div className="profesor-nombre">{prof.nombre}</div>
+                <div className="profesor-campus">{prof.campus}</div>
               </ListGroup.Item>
             ))}
           </ListGroup>
         ) : (
-          <p className="text-muted">No hay profesores registrados.</p>
+          <p className="text-muted text-center mt-4">
+            No hay profesores registrados para esta asignatura.
+          </p>
         )}
-      </Modal.Body>
 
-      <Modal.Footer>
-        <Button variant="secondary" onClick={handleClose}>
-          Cerrar
-        </Button>
-      </Modal.Footer>
+        <div className="text-center mt-4">
+        </div>
+      </div>
     </Modal>
   );
 }

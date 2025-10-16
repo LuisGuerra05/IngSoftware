@@ -3,6 +3,7 @@ import { Navbar, Nav, Container, Modal, Button } from "react-bootstrap";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { PersonCircle } from "react-bootstrap-icons";
 import "./Navbar.css";
+import "./ModalPerfil.css"; // ✅ nuevo CSS para el modal de perfil
 
 function AppNavbar() {
   const [show, setShow] = useState(true);
@@ -32,11 +33,6 @@ function AppNavbar() {
 
   const handleNavClick = () => setExpanded(false);
 
-  const handleLogoClick = () => {
-    navigate("/");       // 🔹 Ir al home
-    window.scrollTo(0, 0); // 🔹 Volver al inicio visualmente
-  };
-
   const handleLogout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
@@ -64,7 +60,6 @@ function AppNavbar() {
             />
           </Navbar.Brand>
 
-
           <Navbar.Toggle
             aria-controls="main-navbar"
             aria-expanded={expanded}
@@ -80,7 +75,7 @@ function AppNavbar() {
                 onClick={handleNavClick}
                 className="py-2"
               >
-                Buscar Profesor
+                Profesor
               </Nav.Link>
 
               <Nav.Link
@@ -90,7 +85,7 @@ function AppNavbar() {
                 onClick={handleNavClick}
                 className="py-2"
               >
-                Buscar Asignatura
+                Asignatura
               </Nav.Link>
             </Nav>
 
@@ -110,27 +105,35 @@ function AppNavbar() {
         </Container>
       </Navbar>
 
-      {/* 🔹 Modal perfil */}
+      {/* 🔹 Modal Perfil estilizado */}
       <Modal
         show={showModal}
         onHide={() => setShowModal(false)}
         centered
-        className="text-center"
+        className="modal-perfil"
+        backdrop={true}
+        keyboard={true}
       >
-        <Modal.Body className="p-4">
+        <div className="modal-perfil-header">
+          <Modal.Header closeButton closeVariant="white">
+            <Modal.Title>Perfil del Usuario</Modal.Title>
+          </Modal.Header>
+        </div>
+
+        <div className="modal-perfil-body text-center">
           <img
             src="/img/Logo.png"
             alt="Logo Calificador de Profesores"
-            style={{ width: 110, height: "auto", marginBottom: 10 }}
+            className="perfil-logo"
           />
 
-          <h5 className="mb-2 fw-semibold">Sesión activa</h5>
+          <h5 className="perfil-titulo">Sesión activa</h5>
 
-          <p className="text-muted mb-1" style={{ fontSize: "0.95rem" }}>
+          <p className="perfil-email">
             <strong>{user.email}</strong>
           </p>
 
-          <p className="text-secondary" style={{ fontSize: "0.85rem" }}>
+          <p className="perfil-fecha">
             Último acceso: {new Date().toLocaleDateString("es-CL")}{" "}
             {new Date().toLocaleTimeString("es-CL", {
               hour: "2-digit",
@@ -138,12 +141,12 @@ function AppNavbar() {
             })}
           </p>
 
-          <div className="d-grid gap-2 mt-3">
-            <Button onClick={handleLogout} className="boton-negro">
+          <div className="text-center mt-4">
+            <Button onClick={handleLogout} className="btn-cerrar-sesion">
               Cerrar sesión
             </Button>
           </div>
-        </Modal.Body>
+        </div>
       </Modal>
     </>
   );

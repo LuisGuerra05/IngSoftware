@@ -52,9 +52,9 @@ export default function Asignaturas() {
                     <Card.Subtitle className="text-muted mb-2">
                       Código: {curso.codigo}
                     </Card.Subtitle>
-                    <Card.Text>
-                      <strong>Profesores registrados:</strong>{" "}
-                      {curso.profesores?.length || 0}
+                    <Card.Text className="asignatura-profes">
+                      <strong>Profesores:</strong>
+                      <span className="badge-count">{curso.profesores?.length || 0}</span>
                     </Card.Text>
                   </Card.Body>
                 </Card>

@@ -1,0 +1,115 @@
+/* ===== MODAL PERFIL (Cerrar sesión) ===== */
+.modal-perfil .modal-content {
+  border-radius: 18px;
+  border: none;
+  background: #ffffff;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.18);
+  overflow: hidden;
+  animation: fadeInUp 0.35s ease;
+}
+
+/* Header */
+.modal-perfil-header .modal-header {
+  background: linear-gradient(135deg, #005fa3, #003e6b);
+  color: #fff;
+  border: none;
+  border-radius: 0;
+  margin: 0;
+  padding: 1.2rem 1.5rem;
+}
+
+.modal-perfil-header .modal-title {
+  font-size: clamp(1.2rem, 3vw, 1.4rem);
+  font-weight: 600;
+  letter-spacing: 0.3px;
+}
+
+.modal-perfil .btn-close {
+  filter: brightness(0) invert(1);
+  opacity: 0.9;
+}
+.modal-perfil .btn-close:hover {
+  opacity: 1;
+}
+
+/* Body */
+.modal-perfil-body {
+  background: #fafafa;
+  padding: 2rem 2rem 2.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.perfil-logo {
+  width: 110px;
+  height: auto;
+  margin-bottom: 15px;
+}
+
+.perfil-titulo {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #111;
+  margin-bottom: 0.3rem;
+}
+
+.perfil-email {
+  font-size: 0.95rem;
+  color: #374151;
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  padding: 8px 14px;
+  margin: 10px 0 0;
+}
+
+.perfil-fecha {
+  font-size: 0.85rem;
+  color: #6b7280;
+  margin-top: 0.8rem;
+  margin-bottom: 1rem;
+}
+
+/* Botón cerrar sesión */
+.btn-cerrar-sesion {
+  background: linear-gradient(135deg, #005fa3, #003e6b) !important;
+  border: none !important;
+  border-radius: 10px !important;
+  padding: 10px 28px !important;
+  font-weight: 500 !important;
+  color: #fff !important;
+  transition: all 0.3s ease;
+  min-width: 150px;
+}
+
+.btn-cerrar-sesion:hover {
+  background: linear-gradient(135deg, #003e6b, #002a4a) !important;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(0, 95, 163, 0.25);
+}
+
+/* Animación entrada */
+@keyframes fadeInUp {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* Responsive */
+@media (max-width: 576px) {
+  .modal-perfil-body {
+    padding: 1.5rem;
+  }
+  .perfil-email {
+    font-size: 0.9rem;
+  }
+  .perfil-titulo {
+    font-size: 1.1rem;
+  }
+}

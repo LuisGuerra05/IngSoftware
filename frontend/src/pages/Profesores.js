@@ -24,10 +24,26 @@ export default function Profesores() {
       });
   }, []);
 
-  console.log("📊 Estado actual de profesores:", profesores);
-
   const handleCardClick = (id) => {
     navigate(`/detalle-profe/${id}`);
+  };
+
+  // 🔹 Función para obtener cursos ordenados y limitados
+  const renderCursos = (cursos = []) => {
+    if (cursos.length === 0) return "Sin cursos";
+
+    // 1️⃣ Ordenar alfabéticamente
+    const sorted = [...cursos].sort((a, b) =>
+      a.nombre.localeCompare(b.nombre, "es", { sensitivity: "base" })
+    );
+
+    // 2️⃣ Tomar máximo 3
+    const mostrados = sorted.slice(0, 3).map((c) => c.nombre);
+
+    // 3️⃣ Si hay más, agregar puntos suspensivos
+    const sufijo = cursos.length > 3 ? " ..." : "";
+
+    return mostrados.join(", ") + sufijo;
   };
 
   return (
@@ -58,9 +74,7 @@ export default function Profesores() {
                         Campus: {prof.campus}
                       </Card.Subtitle>
                       <Card.Text>
-                        <strong>Cursos:</strong>{" "}
-                        {prof.cursos?.map((c) => c.nombre).join(", ") ||
-                          "Sin cursos"}
+                        <strong>Cursos:</strong> {renderCursos(prof.cursos)}
                       </Card.Text>
                       <a
                         href={prof.linkUAI}

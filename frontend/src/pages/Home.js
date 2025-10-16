@@ -1,4 +1,6 @@
 import React, { useState } from "react";
+import { Container, Form, Button } from "react-bootstrap";
+import "./Home.css";
 
 function Home() {
   const [query, setQuery] = useState("");
@@ -10,52 +12,32 @@ function Home() {
   };
 
   return (
-    <main
-      style={{
-        maxWidth: 800,
-        margin: "0 auto",
-        textAlign: "center",
-        color: "#111",
-      }}
-    >
-      <h1 style={{ fontSize: 36, fontWeight: 700, marginBottom: 8 }}>
-        Escoge mejor tu{" "}
-        <u style={{ textDecorationColor: "#e5e7eb" }}>profesor</u>
-      </h1>
+    <Container className="home-page">
+      <div className="text-center">
+        <h1 className="home-title">
+          Escoge mejor tu profesor
+        </h1>
+        <p className="home-subtitle">
+          Centraliza evaluaciones y datos en un solo lugar.
+        </p>
 
-      <p style={{ color: "#6b7280", fontSize: 16, marginBottom: 24 }}>
-        Centraliza evaluaciones y datos en un solo lugar.
-      </p>
-
-      <form
-        onSubmit={handleSearch}
-        style={{
-          display: "flex",
-          justifyContent: "center",
-          gap: 8,
-          marginBottom: 60,
-        }}
-      >
-        <input
-          type="text"
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          placeholder="Buscar por profesor o asignatura..."
-          style={{
-            flex: 1,
-            maxWidth: 600,
-            padding: "12px 14px",
-            borderRadius: 12,
-            border: "1px solid #d1d5db",
-            outline: "none",
-          }}
-        />
-        <button type="submit" className="boton-negro">
-          Buscar
-        </button>
-
-      </form>
-    </main>
+        <Form
+          onSubmit={handleSearch}
+          className="d-flex justify-content-center align-items-center gap-2 home-form"
+        >
+          <Form.Control
+            type="text"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="Buscar por profesor o asignatura..."
+            className="home-input"
+          />
+          <Button type="submit" className="home-btn">
+            Buscar
+          </Button>
+        </Form>
+      </div>
+    </Container>
   );
 }
 

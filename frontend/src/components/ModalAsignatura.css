@@ -1,0 +1,162 @@
+/* ===== MODAL ASIGNATURA ESTÉTICO ===== */
+.modal-asignatura .modal-content {
+  border-radius: 18px;
+  border: none;
+  background: #ffffff;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.18);
+  overflow: hidden;
+  animation: fadeInUp 0.35s ease;
+  transition: all 0.3s ease;
+}
+
+/* Animación entrada */
+@keyframes fadeInUp {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* HEADER */
+.modal-asignatura-header .modal-header {
+  background: linear-gradient(135deg, #005fa3, #003e6b);
+  color: #fff;
+  border: none;
+  border-radius: 0;
+  margin: 0;
+  padding: 1.2rem 1.5rem;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* Eliminar borde visual entre header y body */
+.modal-asignatura .modal-header .btn-close {
+  filter: brightness(0) invert(1);
+  opacity: 0.9;
+}
+.modal-asignatura .modal-header .btn-close:hover {
+  opacity: 1;
+}
+
+/* Título */
+.modal-asignatura-header .modal-title {
+  font-size: clamp(1.3rem, 3vw, 1.6rem);
+  font-weight: 600;
+  letter-spacing: 0.3px;
+  color: #fff;
+}
+
+/* BODY */
+.modal-asignatura-body {
+  background: #fafafa;
+  padding: 1.8rem 2rem 2.4rem;
+}
+
+/* Código */
+.modal-info {
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  padding: 10px 14px;
+  margin-bottom: 1.3rem;
+  font-size: 0.95rem;
+  color: #374151;
+  display: block;
+}
+
+/* Subtítulo */
+.modal-subtitle {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #111;
+  margin-bottom: 0.8rem;
+  text-align: left;
+}
+
+/* LISTA DE PROFESORES */
+.profesores-list {
+  max-height: 280px;
+  overflow-y: auto;
+  margin-bottom: 1.5rem;
+  scrollbar-width: thin;
+  scrollbar-color: #005fa3 #f3f4f6;
+}
+
+/* Items */
+.profesor-item {
+  background-color: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  margin-bottom: 10px;
+  padding: 0.9rem 1.1rem;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+  transition: all 0.2s ease;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+}
+
+.profesor-item:hover {
+  transform: translateX(3px);
+  box-shadow: 0 4px 10px rgba(0, 95, 163, 0.15);
+  border-color: #005fa3;
+  background-color: #f3f8fc;
+}
+
+.profesor-nombre {
+  font-weight: 600;
+  color: #111;
+  font-size: 1rem;
+}
+
+.profesor-campus {
+  color: #6b7280;
+  font-size: 0.9rem;
+}
+
+/* BOTÓN CERRAR */
+.btn-cerrar-modal {
+  background: linear-gradient(135deg, #005fa3, #003e6b) !important;
+  border: none !important;
+  border-radius: 10px !important;
+  padding: 10px 28px !important;
+  font-weight: 500 !important;
+  color: #fff !important;
+  letter-spacing: 0.3px;
+  transition: all 0.3s ease;
+  min-width: 120px;
+}
+
+.btn-cerrar-modal:hover {
+  background: linear-gradient(135deg, #003e6b, #002a4a) !important;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(0, 95, 163, 0.25);
+}
+
+/* Scrollbar invisible pero funcional */
+.profesores-list {
+  scrollbar-width: none; /* Firefox */
+}
+.profesores-list::-webkit-scrollbar {
+  width: 0; /* Chrome, Edge, Safari */
+  height: 0;
+  background: transparent;
+}
+
+
+/* RESPONSIVE */
+@media (max-width: 576px) {
+  .modal-asignatura-body {
+    padding: 1.5rem;
+  }
+  .modal-info {
+    font-size: 0.9rem;
+  }
+  .modal-subtitle {
+    font-size: 1rem;
+  }
+}

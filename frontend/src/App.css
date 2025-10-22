@@ -16,3 +16,29 @@
   color: #f9fafb !important; /* blanco más brillante */
   box-shadow: 0 0 8px rgba(0, 0, 0, 0.25); /* leve halo de sombra */
 }
+
+/* ===== PAGINACIÓN PERSONALIZADA ===== */
+.pagination .page-item.active .page-link {
+  background: linear-gradient(135deg, #005fa3, #003e6b);
+  border-color: #003e6b;
+  color: #fff;
+}
+
+.pagination .page-link {
+  color: #005fa3;
+  border: 1px solid #e5e7eb;
+  font-weight: 500;
+  transition: all 0.25s ease;
+}
+
+.pagination .page-link:hover {
+  background-color: #f3f8fc;
+  color: #003e6b;
+  border-color: #005fa3;
+}
+
+.pagination .page-item.disabled .page-link {
+  color: #9ca3af;
+  background-color: #f9fafb;
+  border-color: #e5e7eb;
+}

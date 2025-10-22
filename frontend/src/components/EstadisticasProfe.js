@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Spinner, Card } from "react-bootstrap";
+import { Spinner, Card, ProgressBar } from "react-bootstrap";
 import { getCalificacionesByProfesor } from "../api/api";
 import { StarFill, Star } from "react-bootstrap-icons";
 import "./EstadisticasProfe.css";
@@ -60,6 +60,7 @@ export default function EstadisticasProfe({ profesorId }) {
       <Card.Body>
         <h5 className="estadisticas-titulo">Valoraciones promedio</h5>
 
+        {/* ⭐ Categorías principales */}
         <div className="categorias-container">
           {categorias.map((cat) => {
             const valor = Math.round(stats.promedios[cat.key]);
@@ -75,6 +76,43 @@ export default function EstadisticasProfe({ profesorId }) {
           })}
         </div>
 
+        {/* ✅ Indicadores adicionales */}
+        {stats.indicadores && (
+          <div className="indicadores-container">
+            {/* ¿Lo volverías a tomar? */}
+            <div className="mb-3">
+              <p className="mb-1 fw-semibold">¿Lo volverías a tomar?</p>
+              <p className="text-primary mb-1">
+                Sí: {stats.indicadores.volveriaTomar}%
+              </p>
+              <ProgressBar
+                now={stats.indicadores.volveriaTomar}
+                className="progress-bar-blue"
+              />
+            </div>
+
+            {/* Nivel de dificultad */}
+            <div>
+              <p className="mb-2 fw-semibold">Nivel de dificultad percibida</p>
+              {Object.entries(stats.indicadores.dificultad).map(
+                ([nivel, porcentaje]) => (
+                  <div key={nivel} className="mb-2">
+                    <small className="text-capitalize">
+                      {nivel}: {porcentaje}%
+                    </small>
+                    <ProgressBar
+                      now={porcentaje}
+                      className="progress-bar-blue"
+                    />
+                  </div>
+                )
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* 💬 Comentarios */}
+        <hr />
         <h6 className="comentarios-titulo text-center">
           Comentarios de estudiantes
         </h6>

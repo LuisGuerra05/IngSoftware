@@ -79,7 +79,6 @@ export default function EstadisticasProfe({ profesorId }) {
         {/* ✅ Indicadores adicionales */}
         {stats.indicadores && (
           <div className="indicadores-container">
-            {/* ¿Lo volverías a tomar? */}
             <div className="mb-3">
               <p className="mb-1 fw-semibold">¿Lo volverías a tomar?</p>
               <p className="text-primary mb-1">
@@ -91,7 +90,6 @@ export default function EstadisticasProfe({ profesorId }) {
               />
             </div>
 
-            {/* Nivel de dificultad */}
             <div>
               <p className="mb-2 fw-semibold">Nivel de dificultad percibida</p>
               {Object.entries(stats.indicadores.dificultad).map(
@@ -109,28 +107,6 @@ export default function EstadisticasProfe({ profesorId }) {
               )}
             </div>
           </div>
-        )}
-
-        {/* 💬 Comentarios */}
-        <hr />
-        <h6 className="comentarios-titulo text-center">
-          Comentarios de estudiantes
-        </h6>
-        {stats.comentarios && stats.comentarios.length > 0 ? (
-          <div className="comentarios-lista">
-            {stats.comentarios.map((c, i) => (
-              <div key={i} className="comentario-item">
-                <p className="mb-1">“{c.comentario}”</p>
-                <div className="comentario-fecha">
-                  {new Date(c.fecha).toLocaleDateString("es-CL")}
-                </div>
-              </div>
-            ))}
-          </div>
-        ) : (
-          <p className="text-muted text-center mb-0">
-            No hay comentarios disponibles.
-          </p>
         )}
       </Card.Body>
     </Card>

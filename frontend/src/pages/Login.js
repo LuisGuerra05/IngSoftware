@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState } from 'react'; 
 import { useNavigate } from 'react-router-dom';
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
@@ -14,7 +14,7 @@ function Login() {
   const [password, setPassword] = useState('');
   const [touched, setTouched] = useState({ email: false, password: false });
   const [loading, setLoading] = useState(false);
-  const [errorMsg, setErrorMsg] = useState(''); // <- usaremos este texto
+  const [errorMsg, setErrorMsg] = useState('');
 
   const emailValid = UAI_REGEX.test(email);
   const pwdValid = password.length >= 6;
@@ -42,12 +42,19 @@ function Login() {
       const data = await res.json().catch(() => ({}));
 
       if (!res.ok || !data?.token) {
-        // toma el mensaje del backend si viene; si no, usa uno genérico
         throw new Error(data?.error || 'Correo o contraseña incorrecta');
       }
 
+      // 🔹 Guardar token y usuario completo
       localStorage.setItem('token', data.token);
       localStorage.setItem('user', JSON.stringify(data.user));
+
+      // 🔹 Guardar email del usuario para mostrarlo en otras vistas
+      if (data.user?.email) {
+        localStorage.setItem('usuario', data.user.email);
+      }
+
+      // Redirigir al home
       navigate('/');
     } catch (err) {
       setErrorMsg(err.message || 'No se pudo iniciar sesión');
@@ -66,14 +73,13 @@ function Login() {
             style={{ width: '200px', marginBottom: '1px' }}
           />
 
-          {/* NUEVO: subtítulo pequeño bajo el logo */}
           <div className="logo-caption tight">Calificador de Profesores</div>
-
           <h2>PLATAFORMA ACADÉMICA</h2>
           <p>Ingrese con su correo UAI</p>
         </div>
 
         <Form onSubmit={handleSubmit} noValidate className="login-form">
+          {/* Email */}
           <Form.Group className="mb-3" controlId="formBasicEmail">
             <Form.Label>Email</Form.Label>
             <Form.Control
@@ -90,6 +96,7 @@ function Login() {
             </Form.Control.Feedback>
           </Form.Group>
 
+          {/* Contraseña */}
           <Form.Group className="mb-3" controlId="formBasicPassword">
             <Form.Label>Contraseña</Form.Label>
             <Form.Control
@@ -103,18 +110,22 @@ function Login() {
             />
           </Form.Group>
 
-          {/* Mensaje general de error del backend */}
-            {errorMsg && (
+          {/* Error del backend */}
+          {errorMsg && (
             <Alert variant="danger" className="mb-3" role="alert">
-                {errorMsg}
+              {errorMsg}
             </Alert>
-            )}
+          )}
 
-          <Button type="submit" className="login-btn" disabled={!formValid || loading}>
+          {/* Botón */}
+          <Button
+            type="submit"
+            className="login-btn"
+            disabled={!formValid || loading}
+          >
             {loading ? 'Ingresando…' : 'Ingresar'}
           </Button>
         </Form>
-        
       </div>
     </div>
   );

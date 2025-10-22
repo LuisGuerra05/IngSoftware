@@ -75,7 +75,7 @@ function AppNavbar() {
                 onClick={handleNavClick}
                 className="py-2"
               >
-                Profesor
+                Profesores
               </Nav.Link>
 
               <Nav.Link
@@ -85,7 +85,7 @@ function AppNavbar() {
                 onClick={handleNavClick}
                 className="py-2"
               >
-                Asignatura
+                Asignaturas
               </Nav.Link>
 
               <Nav.Link

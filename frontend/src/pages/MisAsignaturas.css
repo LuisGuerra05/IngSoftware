@@ -1,0 +1,21 @@
+/* ===== Botón Limpiar Ramos ===== */
+.btn-limpiar-ramos {
+  background: linear-gradient(135deg, #005fa3, #003e6b) !important;
+  border: none !important;
+  border-radius: 10px !important;
+  padding: 10px 28px !important;
+  font-weight: 500 !important;
+  color: #fff !important;
+  transition: all 0.3s ease;
+  min-width: 150px;
+}
+
+.btn-limpiar-ramos:hover {
+  background: linear-gradient(135deg, #003e6b, #002a4a) !important;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(0, 95, 163, 0.25);
+}
+
+.btn-limpiar-ramos:active {
+  transform: translateY(0);
+}

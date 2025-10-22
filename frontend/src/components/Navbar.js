@@ -87,6 +87,16 @@ function AppNavbar() {
               >
                 Asignatura
               </Nav.Link>
+
+              <Nav.Link
+                as={Link}
+                to="/mis-asignaturas"
+                active={location.pathname === "/mis-asignaturas"}
+                onClick={handleNavClick}
+                className="py-2"
+              >
+                Mis Asignaturas
+              </Nav.Link>
             </Nav>
 
             {/* 🔹 Ícono perfil */}

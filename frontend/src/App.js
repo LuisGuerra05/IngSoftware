@@ -5,6 +5,7 @@ import Login from "./pages/Login";
 import Home from "./pages/Home";
 import Profesores from "./pages/Profesores";
 import Asignaturas from "./pages/Asignaturas";
+import MisAsignaturas from "./pages/MisAsignaturas";
 import DetalleProfe from "./pages/DetalleProfe";
 import Layout from "./components/Layout";
 import "./App.css";
@@ -46,6 +47,18 @@ export default function App() {
           <ProtectedRoute>
             <Layout>
               <Asignaturas />
+            </Layout>
+          </ProtectedRoute>
+        }
+      />
+
+      {/* --- Mis Asignaturas --- */}
+      <Route
+        path="/mis-asignaturas"
+        element={
+          <ProtectedRoute>
+            <Layout>
+              <MisAsignaturas />
             </Layout>
           </ProtectedRoute>
         }

@@ -1,5 +1,7 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
+import { useAuth } from "./context/AuthContext";
+import { setLogoutHandler } from "./api/axiosInstance";
 import ProtectedRoute from "./ProtectedRoute";
 import Login from "./pages/Login";
 import Home from "./pages/Home";
@@ -11,12 +13,16 @@ import Layout from "./components/Layout";
 import "./App.css";
 
 export default function App() {
+  const { logout } = useAuth();
+
+  // 🔹 Vincula el logout del contexto con axios
+  useEffect(() => {
+    setLogoutHandler(() => logout);
+  }, [logout]);
+
   return (
     <Routes>
-      {/* --- Login --- */}
       <Route path="/login" element={<Login />} />
-
-      {/* --- Home --- */}
       <Route
         path="/"
         element={
@@ -27,8 +33,6 @@ export default function App() {
           </ProtectedRoute>
         }
       />
-
-      {/* --- Profesores --- */}
       <Route
         path="/profesores"
         element={
@@ -39,8 +43,6 @@ export default function App() {
           </ProtectedRoute>
         }
       />
-
-      {/* --- Asignaturas --- */}
       <Route
         path="/asignaturas"
         element={
@@ -51,8 +53,6 @@ export default function App() {
           </ProtectedRoute>
         }
       />
-
-      {/* --- Mis Asignaturas --- */}
       <Route
         path="/mis-asignaturas"
         element={
@@ -63,8 +63,6 @@ export default function App() {
           </ProtectedRoute>
         }
       />
-
-      {/* --- Detalle del Profesor --- */}
       <Route
         path="/detalle-profe/:id"
         element={
@@ -75,8 +73,6 @@ export default function App() {
           </ProtectedRoute>
         }
       />
-
-      {/* --- Catch-all --- */}
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );

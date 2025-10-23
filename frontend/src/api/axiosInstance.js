@@ -1,10 +1,15 @@
 import axios from "axios";
 
+let logoutHandler = null; // será asignado desde el contexto
+
+export const setLogoutHandler = (handler) => {
+  logoutHandler = handler;
+};
+
 const axiosInstance = axios.create({
-  baseURL: "/api", // funciona tanto local como en Azure
+  baseURL: "/api",
 });
 
-// Interceptor: agrega el token JWT
 axiosInstance.interceptors.request.use((config) => {
   const token = localStorage.getItem("token");
   if (token) {
@@ -13,14 +18,11 @@ axiosInstance.interceptors.request.use((config) => {
   return config;
 });
 
-// Interceptor: maneja 401 automáticamente
 axiosInstance.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error?.response?.status === 401) {
-      localStorage.removeItem("token");
-      localStorage.removeItem("user");
-      window.location.href = "/login"; // limpia estado y redirige
+    if (error?.response?.status === 401 && logoutHandler) {
+      logoutHandler(); // 🔹 ejecuta logout React sin recargar
     }
     return Promise.reject(error);
   }

@@ -1,8 +1,19 @@
 import React, { useState, useRef, useEffect } from "react";
-import { Container, Form, Button, Row, Col, ListGroup, Spinner } from "react-bootstrap";
+import {
+  Container,
+  Form,
+  Button,
+  Row,
+  Col,
+  ListGroup,
+  Spinner,
+  Card,
+} from "react-bootstrap";
 import "./Home.css";
 import { search } from "../api/api";
 import { useNavigate } from "react-router-dom";
+import NoResults from "../components/NoResults";
+import "bootstrap-icons/font/bootstrap-icons.css";
 
 function Home() {
   const [query, setQuery] = useState("");
@@ -12,13 +23,7 @@ function Home() {
   const debounceRef = useRef(null);
   const navigate = useNavigate();
 
-  const handleSearch = (e) => {
-    e.preventDefault();
-    if (!query.trim()) return;
-    console.log("Buscando:", query);
-  };
-
-  // Efecto: buscar cuando query cambie (debounce)
+  // 🔹 Ejecutar búsqueda con debounce
   useEffect(() => {
     if (!query.trim()) {
       setResults({ profesores: [], cursos: [] });
@@ -30,35 +35,48 @@ function Home() {
     if (debounceRef.current) clearTimeout(debounceRef.current);
     debounceRef.current = setTimeout(() => {
       search(query)
-        .then((data) => {
-          setResults(data);
-        })
-        .catch((err) => console.error('Error search:', err))
+        .then((data) => setResults(data))
+        .catch((err) => console.error("Error search:", err))
         .finally(() => setLoading(false));
     }, 300);
 
     return () => clearTimeout(debounceRef.current);
   }, [query]);
 
-  const handleSelectProfesor = (id) => {
-    navigate(`/detalle-profe/${id}`);
+  const handleSearch = (e) => {
+    e.preventDefault();
+    if (!query.trim()) return;
   };
 
-  const handleSelectCurso = (id) => {
-    // Navegar a Asignaturas y pasar id en query para abrir el modal
-    navigate(`/asignaturas?id=${id}`);
-  };
+  const handleSelectProfesor = (id) => navigate(`/detalle-profe/${id}`);
+  const handleSelectCurso = (id) => navigate(`/asignaturas?id=${id}`);
+
+  const filteredProfesores =
+    filterType === "profesores"
+      ? results.profesores
+      : filterType === "cursos"
+      ? []
+      : results.profesores;
+  const filteredCursos =
+    filterType === "cursos"
+      ? results.cursos
+      : filterType === "profesores"
+      ? []
+      : results.cursos;
 
   return (
     <Container className="home-page">
-      <Row className="justify-content-center text-center">
+      {/* --- Hero --- */}
+      <Row className="justify-content-center text-center mb-4">
         <Col xs={12} md={8}>
-          <h1 className="home-title">Escoge mejor tu profesor</h1>
-          <p className="home-subtitle">
+          <h1 className="home-title fw-bold">Escoge mejor tu profesor</h1>
+          <p className="home-subtitle text-muted">
             Centraliza evaluaciones y datos en un solo lugar.
           </p>
         </Col>
       </Row>
+
+      {/* --- Buscador principal --- */}
       <Row className="justify-content-center">
         <Col xs={12} md={8}>
           <Form
@@ -70,13 +88,12 @@ function Home() {
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder="Buscar por profesor o asignatura..."
-              className="home-input"
+              className="home-input shadow-sm"
             />
             <Form.Select
-              className="home-filter-select"
+              className="home-filter-select shadow-sm"
               value={filterType}
               onChange={(e) => setFilterType(e.target.value)}
-              aria-label="Filtrar resultados"
               style={{ maxWidth: 200 }}
             >
               <option value="all">Todos</option>
@@ -84,35 +101,59 @@ function Home() {
               <option value="cursos">Asignaturas</option>
             </Form.Select>
             <Button type="submit" className="home-btn">
-              Buscar
+              <i className="bi bi-search"></i> Buscar
             </Button>
           </Form>
-            {/* Resultados en tiempo real */}
-            <div className="search-results mt-2">
-              {loading && (
-                <div className="p-2 text-center"><Spinner animation="border" size="sm" /></div>
-              )}
 
-              {!loading && (results.profesores.length === 0 && results.cursos.length === 0) && query.trim() !== '' && (
-                <div className="p-2 text-muted">No se encontraron resultados</div>
-              )}
+          {/* --- Resultados --- */}
+          <div className="search-results mt-3">
+            {loading && (
+              <div className="p-3 text-center text-muted">
+                <Spinner animation="border" size="sm" /> Buscando...
+              </div>
+            )}
 
-              {!loading && (
-                <ListGroup>
-                  {filterType !== 'cursos' && results.profesores.map((p) => (
-                    <ListGroup.Item key={`p-${p._id}`} action onClick={() => handleSelectProfesor(p._id)}>
-                      {filterType === 'all' ? `Profesor: ${p.nombre}` : p.nombre} <small className="text-muted">{p.campus}</small>
+            {!loading &&
+              query.trim() !== "" &&
+              filteredProfesores.length === 0 &&
+              filteredCursos.length === 0 && <NoResults query={query} />}
+
+            {!loading && (filteredProfesores.length > 0 || filteredCursos.length > 0) && (
+              <Card className="shadow-sm border-0 mt-2">
+                <ListGroup variant="flush">
+                  {filteredProfesores.map((p) => (
+                    <ListGroup.Item
+                      key={`p-${p._id}`}
+                      action
+                      onClick={() => handleSelectProfesor(p._id)}
+                      className="py-2 d-flex justify-content-between align-items-center search-item"
+                    >
+                      <div>
+                        <i className="bi bi-person-circle me-2 icon-blue"></i>
+                        {p.nombre}
+                      </div>
+                      <small className="text-muted">{p.campus}</small>
                     </ListGroup.Item>
                   ))}
 
-                  {filterType !== 'profesores' && results.cursos.map((c) => (
-                    <ListGroup.Item key={`c-${c._id}`} action onClick={() => handleSelectCurso(c._id)}>
-                      {filterType === 'all' ? `Asignatura: ${c.nombre}` : c.nombre} <small className="text-muted">{c.codigo}</small>
+                  {filteredCursos.map((c) => (
+                    <ListGroup.Item
+                      key={`c-${c._id}`}
+                      action
+                      onClick={() => handleSelectCurso(c._id)}
+                      className="py-2 d-flex justify-content-between align-items-center search-item"
+                    >
+                      <div>
+                        <i className="bi bi-journal-bookmark me-2 icon-blue"></i>
+                        {c.nombre}
+                      </div>
+                      <small className="text-muted">{c.codigo}</small>
                     </ListGroup.Item>
                   ))}
                 </ListGroup>
-              )}
-            </div>
+              </Card>
+            )}
+          </div>
         </Col>
       </Row>
     </Container>

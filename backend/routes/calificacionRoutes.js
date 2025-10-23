@@ -23,10 +23,11 @@ router.post("/", requireAuth, async (req, res) => {
     // Verificar si ya calificó a este profesor
     const existente = await Calificacion.findOne({ profesorId, estudianteId });
     if (existente) {
-      return res.status(400).json({ message: "Ya has calificado a este profesor." });
+      return res
+        .status(400)
+        .json({ message: "Ya has calificado a este profesor." });
     }
 
-    // Crear nueva calificación
     const calificacion = new Calificacion({
       profesorId,
       estudianteId,
@@ -89,7 +90,6 @@ router.get("/:profesorId", async (req, res) => {
       promedios[key] = (promedios[key] / total).toFixed(1);
     }
 
-    // Porcentajes agregados
     const indicadores = {
       volveriaTomar: ((volveriaSi / total) * 100).toFixed(1),
       dificultad: {
@@ -111,6 +111,60 @@ router.get("/:profesorId", async (req, res) => {
           fecha: c.createdAt,
         })),
     });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// 🔹 Obtener la calificación del usuario autenticado para un profesor
+router.get("/mis/:profesorId", requireAuth, async (req, res) => {
+  try {
+    const estudianteId = req.user.sub || req.user.id;
+    const { profesorId } = req.params;
+
+    const calificacion = await Calificacion.findOne({ profesorId, estudianteId });
+    if (!calificacion) return res.json(null);
+    res.json(calificacion);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// 🔹 Actualizar una calificación existente
+router.put("/:id", requireAuth, async (req, res) => {
+  try {
+    const estudianteId = req.user.sub || req.user.id;
+    const { id } = req.params;
+
+    const calificacion = await Calificacion.findOne({ _id: id, estudianteId });
+    if (!calificacion) {
+      return res.status(404).json({ message: "Calificación no encontrada." });
+    }
+
+    Object.assign(calificacion, req.body);
+    await calificacion.save();
+    res.json(calificacion);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// 🔹 Eliminar calificación
+router.delete("/:id", requireAuth, async (req, res) => {
+  try {
+    const estudianteId = req.user.sub || req.user.id;
+    const { id } = req.params;
+
+    const calificacion = await Calificacion.findOneAndDelete({
+      _id: id,
+      estudianteId,
+    });
+
+    if (!calificacion) {
+      return res.status(404).json({ message: "Calificación no encontrada." });
+    }
+
+    res.json({ message: "Calificación eliminada correctamente." });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

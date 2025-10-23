@@ -39,6 +39,29 @@ export async function getCalificacionesByProfesor(id) {
   return data;
 }
 
+// --- Calificación del usuario autenticado ---
+// 🔹 Cambiamos "mia" por "mis" para evitar conflicto con "/:profesorId"
+export async function getMiCalificacionByProfesor(id, token) {
+  const { data } = await axios.get(`/calificaciones/mis/${id}`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  return data;
+}
+
+export async function updateCalificacion(id, formData, token) {
+  const { data } = await axios.put(`/calificaciones/${id}`, formData, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  return data;
+}
+
+export async function deleteCalificacion(id, token) {
+  const { data } = await axios.delete(`/calificaciones/${id}`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  return data;
+}
+
 // --- Búsqueda (profesores + cursos) ---
 export async function search(q) {
   const { data } = await axios.get(`/search`, { params: { q } });

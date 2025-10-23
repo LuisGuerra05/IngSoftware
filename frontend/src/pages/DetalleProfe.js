@@ -4,6 +4,7 @@ import {
   getProfesorById,
   getCursoById,
   getCalificacionesByProfesor,
+  getMiCalificacionByProfesor,
 } from "../api/api";
 import {
   Container,
@@ -27,20 +28,33 @@ export default function DetalleProfe() {
   const [error, setError] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [cursoSeleccionado, setCursoSeleccionado] = useState(null);
-  const [showModalCalificacion, setShowModalCalificacion] = useState(false); // 👈 nombre correcto
+  const [showModalCalificacion, setShowModalCalificacion] = useState(false);
+  const [miCalificacion, setMiCalificacion] = useState(null);
 
-  // 🔹 Cargar datos del profesor y sus calificaciones
+  const token = localStorage.getItem("token");
+
+  // Cargar datos del profesor, calificaciones y mi reseña
+  const cargarDatos = async () => {
+    try {
+      const [profData, califData, miCalif] = await Promise.all([
+        getProfesorById(id),
+        getCalificacionesByProfesor(id),
+        getMiCalificacionByProfesor(id, token),
+      ]);
+      setProfesor(profData);
+      setComentarios(califData?.comentarios || []);
+      setMiCalificacion(miCalif);
+    } catch (err) {
+      setError("No se pudo cargar la información del profesor.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    Promise.all([getProfesorById(id), getCalificacionesByProfesor(id)])
-      .then(([profData, califData]) => {
-        setProfesor(profData);
-        setComentarios(califData?.comentarios || []);
-      })
-      .catch(() => setError("No se pudo cargar la información del profesor."))
-      .finally(() => setLoading(false));
+    cargarDatos();
   }, [id]);
 
-  // 🔹 Abrir modal con información del curso
   const handleOpenModal = async (curso) => {
     try {
       const cursoCompleto = await getCursoById(curso._id);
@@ -56,18 +70,8 @@ export default function DetalleProfe() {
     setCursoSeleccionado(null);
   };
 
-  // 🔹 Refrescar datos tras enviar calificación
   const refrescarDatos = async () => {
-    try {
-      const [profData, califData] = await Promise.all([
-        getProfesorById(id),
-        getCalificacionesByProfesor(id),
-      ]);
-      setProfesor(profData);
-      setComentarios(califData?.comentarios || []);
-    } catch (err) {
-      console.error("Error refrescando datos:", err);
-    }
+    await cargarDatos();
   };
 
   if (loading)
@@ -97,7 +101,6 @@ export default function DetalleProfe() {
       <Container>
         <Card className="detalle-profe-card shadow-sm">
           <Row className="g-4 align-items-start">
-            {/* 🔹 Columna izquierda */}
             <Col xs={12} md={5} className="detalle-profe-info">
               <h2 className="detalle-profe-nombre">{profesor.nombre}</h2>
               <span className="detalle-profe-campus">{profesor.campus}</span>
@@ -116,18 +119,14 @@ export default function DetalleProfe() {
                 </span>
               </div>
 
-              {/* 🔹 Botones */}
               <div className="d-flex gap-3 mt-3">
                 <Button
                   className="btn-volver"
                   onClick={() => setShowModalCalificacion(true)}
                 >
-                  Evaluar Profesor
+                  {miCalificacion ? "Editar Evaluación" : "Evaluar Profesor"}
                 </Button>
 
-                <Link to="/profesores">
-                  <Button variant="outline-secondary">Volver al listado</Button>
-                </Link>
               </div>
 
               <h5 className="detalle-profe-subtitulo mt-4">Cursos que imparte</h5>
@@ -149,7 +148,6 @@ export default function DetalleProfe() {
                 <p className="text-muted">No hay cursos registrados.</p>
               )}
 
-              {/* 💬 Comentarios */}
               <div className="comentarios-container mt-4">
                 <h5 className="detalle-profe-subtitulo">Comentarios</h5>
                 {comentarios.length > 0 ? (
@@ -169,7 +167,6 @@ export default function DetalleProfe() {
               </div>
             </Col>
 
-            {/* 🔹 Columna derecha */}
             <Col xs={12} md={7} className="detalle-profe-stats">
               <h5 className="detalle-profe-subtitulo">
                 Estadísticas y valoraciones
@@ -180,19 +177,18 @@ export default function DetalleProfe() {
         </Card>
       </Container>
 
-      {/* 🔹 Modal de cursos */}
       <ModalAsignatura
         show={showModal}
         handleClose={handleCloseModal}
         asignatura={cursoSeleccionado}
       />
 
-      {/* 🔹 Modal de calificación */}
       <ModalCalificacion
         show={showModalCalificacion}
         handleClose={() => setShowModalCalificacion(false)}
         profesorId={id}
         profesorNombre={profesor?.nombre}
+        calificacionExistente={miCalificacion}
         onSuccess={refrescarDatos}
       />
     </div>

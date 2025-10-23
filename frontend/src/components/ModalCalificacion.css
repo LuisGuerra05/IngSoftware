@@ -1,0 +1,183 @@
+/* ===== MODAL CALIFICACIÓN (mismo estilo que Asignatura) ===== */
+.modal-calificacion .modal-content {
+  border-radius: 18px;
+  border: none;
+  background: #ffffff;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.18);
+  overflow: hidden;
+  animation: fadeInUp 0.35s ease;
+  transition: all 0.3s ease;
+}
+
+/* Animación */
+@keyframes fadeInUp {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* HEADER */
+.modal-calificacion .modal-header {
+  background: linear-gradient(135deg, #005fa3, #003e6b);
+  color: #fff;
+  border: none;
+  border-radius: 0;
+  padding: 1.2rem 1.5rem;
+}
+
+.modal-calificacion .modal-title {
+  font-size: clamp(1.3rem, 3vw, 1.6rem);
+  font-weight: 600;
+  letter-spacing: 0.3px;
+  color: #fff;
+}
+
+.modal-calificacion .btn-close {
+  filter: brightness(0) invert(1);
+  opacity: 0.9;
+}
+.modal-calificacion .btn-close:hover {
+  opacity: 1;
+}
+
+/* BODY */
+.modal-calificacion .modal-body {
+  background: #fafafa;
+  padding: 1.8rem 2rem 2.2rem;
+}
+
+/* FORMULARIO */
+.modal-calificacion form {
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.05);
+}
+
+.modal-calificacion .form-label {
+  color: #111;
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.modal-calificacion .form-control,
+.modal-calificacion .form-select {
+  border-radius: 10px;
+  border: 1px solid #d1d5db;
+  padding: 0.6rem 0.75rem;
+  font-size: 0.95rem;
+  transition: all 0.2s ease;
+}
+
+.modal-calificacion .form-control:focus,
+.modal-calificacion .form-select:focus {
+  border-color: #005fa3;
+  box-shadow: 0 0 0 0.2rem rgba(0, 95, 163, 0.15);
+}
+
+/* RADIO BUTTONS (Sí/No) */
+.modal-calificacion .form-check-label {
+  font-weight: 500;
+  color: #333;
+}
+
+/* Botones numéricos más pequeños, compactos y alineados a la izquierda */
+.modal-calificacion .btn-group .btn,
+.modal-calificacion .d-flex .btn {
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  margin-right: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 0.9rem;
+  transition: all 0.2s ease;
+}
+
+/* Contenedor de los botones: alineado a la izquierda y compacto */
+.modal-calificacion .form-group .d-flex {
+  justify-content: flex-start !important;
+  gap: 0.4rem;
+  flex-wrap: nowrap;
+}
+
+
+.modal-calificacion .btn-outline-primary:hover {
+  background-color: #005fa3;
+  color: #fff;
+}
+
+/* BOTÓN PRINCIPAL */
+.modal-calificacion .btn-primary {
+  background: linear-gradient(135deg, #005fa3, #003e6b);
+  border: none;
+  border-radius: 10px;
+  padding: 10px 20px;
+  font-weight: 500;
+  letter-spacing: 0.3px;
+  transition: all 0.3s ease;
+}
+
+.modal-calificacion .btn-primary:hover {
+  background: linear-gradient(135deg, #003e6b, #002a4a);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 95, 163, 0.25);
+}
+
+/* ALERTAS */
+.modal-calificacion .alert {
+  border-radius: 10px;
+  font-size: 0.9rem;
+  padding: 0.75rem 1rem;
+}
+
+/* RESPONSIVE */
+@media (max-width: 576px) {
+  .modal-calificacion .modal-body {
+    padding: 1.5rem;
+  }
+
+  .modal-calificacion form {
+    padding: 1.2rem;
+  }
+
+  .modal-calificacion .btn {
+    width: 32px;
+    height: 32px;
+    font-size: 0.85rem;
+  }
+}
+
+/* ===== Ajuste de tamaño general ===== */
+.modal-calificacion .modal-dialog {
+  max-width: 650px; /* ancho ideal: ni muy angosto ni demasiado horizontal */
+  width: 95%;
+}
+
+@media (max-width: 768px) {
+  .modal-calificacion .modal-dialog {
+    max-width: 95%;
+  }
+}
+
+/* Scroll interno si el contenido excede el alto visible */
+.modal-calificacion .modal-body {
+  max-height: 70vh; /* 70% del alto de pantalla */
+  overflow-y: auto;
+}
+
+/* Aumentamos ligeramente el ancho */
+.modal-calificacion .modal-dialog {
+  max-width: 650px;
+  width: 95%;
+}
+

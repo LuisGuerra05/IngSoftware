@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { getCursos } from "../api/api";
+import { getCursos, getCursoById, getMisRamos, saveMisRamos } from "../api/api";
 import {
   Card,
   Container,
@@ -10,6 +10,7 @@ import {
   Modal,
   Badge,
   Alert,
+  Pagination,
 } from "react-bootstrap";
 import ModalAsignatura from "../components/modalAsignatura";
 import "./MisAsignaturas.css";
@@ -24,8 +25,9 @@ export default function MisAsignaturas() {
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const MAX_RAMOS = 8;
 
-  // 🔹 Obtener email del usuario logeado desde localStorage
+  // 🔹 Obtener email y token del usuario logeado
   const usuarioEmail = localStorage.getItem("usuario") || "usuario@alumnos.uai.cl";
+  const token = localStorage.getItem("token");
 
   // 🔹 Paginación
   const [currentPage, setCurrentPage] = useState(1);
@@ -41,30 +43,53 @@ export default function MisAsignaturas() {
 
   const handlePageChange = (pageNumber) => setCurrentPage(pageNumber);
 
-  // 🔹 Cargar ramos guardados del usuario
+  // 🔹 Cargar todos los cursos y los ramos del usuario
   useEffect(() => {
-    const ramosGuardados = JSON.parse(localStorage.getItem("misRamos") || "[]");
-    setMisRamos(ramosGuardados);
-    setModoSeleccion(ramosGuardados.length === 0);
-  }, []);
-
-  // 🔹 Cargar todos los cursos disponibles
-  useEffect(() => {
-    getCursos()
-      .then((data) => {
-        const sorted = [...data].sort((a, b) =>
+    async function cargarDatos() {
+      try {
+        const dataCursos = await getCursos();
+        const sorted = [...dataCursos].sort((a, b) =>
           a.nombre.localeCompare(b.nombre, "es", { sensitivity: "base" })
         );
         setCursos(sorted);
-      })
-      .catch((err) => console.error(err))
-      .finally(() => setLoading(false));
-  }, []);
 
-  const handleOpenModal = (curso) => {
+        // Si hay token, obtener ramos del usuario desde BD
+        if (token) {
+          const ramosBD = await getMisRamos(token);
+          if (ramosBD && ramosBD.length > 0) {
+            setMisRamos(ramosBD);
+            localStorage.setItem("misRamos", JSON.stringify(ramosBD));
+            setModoSeleccion(false);
+          } else {
+            setModoSeleccion(true);
+          }
+        } else {
+          // Si no hay token, usar lo del localStorage
+          const ramosLocal = JSON.parse(localStorage.getItem("misRamos") || "[]");
+          setMisRamos(ramosLocal);
+          setModoSeleccion(ramosLocal.length === 0);
+        }
+      } catch (err) {
+        console.error("❌ Error cargando datos:", err);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    cargarDatos();
+  }, [token]);
+
+  const handleOpenModal = async (curso) => {
+  try {
+    const cursoCompleto = await getCursoById(curso._id);
+    setCursoSeleccionado(cursoCompleto);
+    setShowModal(true);
+  } catch (err) {
+    console.error("❌ Error cargando detalle del curso:", err);
     setCursoSeleccionado(curso);
     setShowModal(true);
-  };
+  }
+};
 
   const handleCloseModal = () => {
     setShowModal(false);
@@ -76,27 +101,38 @@ export default function MisAsignaturas() {
       const nuevosRamos = misRamos.filter((r) => r._id !== curso._id);
       setMisRamos(nuevosRamos);
       localStorage.setItem("misRamos", JSON.stringify(nuevosRamos));
-    } else {
-      if (misRamos.length < MAX_RAMOS) {
-        const nuevosRamos = [...misRamos, curso];
-        setMisRamos(nuevosRamos);
-        localStorage.setItem("misRamos", JSON.stringify(nuevosRamos));
-      }
+    } else if (misRamos.length < MAX_RAMOS) {
+      const nuevosRamos = [...misRamos, curso];
+      setMisRamos(nuevosRamos);
+      localStorage.setItem("misRamos", JSON.stringify(nuevosRamos));
     }
   };
 
-  const handleConfirmarSeleccion = () => {
+  // 🔹 Guardar en BD cuando se confirma
+  const handleConfirmarSeleccion = async () => {
     if (misRamos.length > 0) {
+      try {
+        if (token) {
+          const ids = misRamos.map((r) => r._id);
+          await saveMisRamos(token, ids);
+          console.log("✅ Ramos guardados correctamente en la base de datos");
+        }
+      } catch (err) {
+        console.error("❌ Error guardando ramos en BD:", err);
+      }
       setModoSeleccion(false);
       setCurrentPage(1);
     }
   };
 
-  const handleLimpiarRamos = () => {
-    setShowConfirmModal(true);
-  };
+  const handleLimpiarRamos = () => setShowConfirmModal(true);
 
-  const confirmarLimpiar = () => {
+  const confirmarLimpiar = async () => {
+    try {
+      if (token) await saveMisRamos(token, []); // limpia BD también
+    } catch (err) {
+      console.error("❌ Error al limpiar ramos:", err);
+    }
     setMisRamos([]);
     localStorage.removeItem("misRamos");
     setModoSeleccion(true);
@@ -104,15 +140,17 @@ export default function MisAsignaturas() {
     setCurrentPage(1);
   };
 
-  const estaSeleccionado = (cursoId) => {
-    return misRamos.some((r) => r._id === cursoId);
-  };
+  const estaSeleccionado = (cursoId) => misRamos.some((r) => r._id === cursoId);
 
   // 🔹 Render principal
   return (
     <Container style={{ marginTop: 100, marginBottom: 50 }}>
+      {/* 🔹 Título con misma línea que Asignaturas */}
       <div className="d-flex justify-content-between align-items-center mb-4">
-        <h2 className="fw-bold">Mis Asignaturas</h2>
+        <div>
+          <h2 className="fw-bold mb-0">Mis Asignaturas</h2>
+          <div className="linea-azul"></div>
+        </div>
         {!modoSeleccion && misRamos.length > 0 && (
           <Button className="btn-limpiar-ramos" onClick={handleLimpiarRamos}>
             Limpiar Ramos
@@ -120,7 +158,6 @@ export default function MisAsignaturas() {
         )}
       </div>
 
-      {/* 👋 Mensaje personalizado con email */}
       {!modoSeleccion && misRamos.length > 0 && (
         <p className="text-muted mb-4">
           Bienvenido <strong>{usuarioEmail}</strong>, a tus ramos este semestre.
@@ -197,27 +234,28 @@ export default function MisAsignaturas() {
                 )}
               </Row>
 
-              {/* Paginación */}
+              {/* 🔹 Paginación */}
               {totalPages > 1 && (
                 <div className="d-flex justify-content-center mt-3">
-                  <ul className="pagination">
+                  <Pagination>
+                    <Pagination.Prev
+                      disabled={currentPage === 1}
+                      onClick={() => handlePageChange(currentPage - 1)}
+                    />
                     {Array.from({ length: totalPages }, (_, i) => (
-                      <li
-                        key={i}
-                        className={`page-item ${
-                          currentPage === i + 1 ? "active" : ""
-                        }`}
+                      <Pagination.Item
+                        key={i + 1}
+                        active={currentPage === i + 1}
+                        onClick={() => handlePageChange(i + 1)}
                       >
-                        <Button
-                          variant="link"
-                          className="page-link"
-                          onClick={() => handlePageChange(i + 1)}
-                        >
-                          {i + 1}
-                        </Button>
-                      </li>
+                        {i + 1}
+                      </Pagination.Item>
                     ))}
-                  </ul>
+                    <Pagination.Next
+                      disabled={currentPage === totalPages}
+                      onClick={() => handlePageChange(currentPage + 1)}
+                    />
+                  </Pagination>
                 </div>
               )}
 
@@ -228,7 +266,7 @@ export default function MisAsignaturas() {
                     size="lg"
                     onClick={handleConfirmarSeleccion}
                   >
-                    Confirmar Selección ({misRamos.length} ramos)
+                    Confirmar Selección
                   </Button>
                 </div>
               )}
@@ -273,27 +311,28 @@ export default function MisAsignaturas() {
                     ))}
                   </Row>
 
-                  {/* Paginación */}
+                  {/* 🔹 Paginación igual a Asignaturas */}
                   {totalPages > 1 && (
                     <div className="d-flex justify-content-center mt-3">
-                      <ul className="pagination">
+                      <Pagination>
+                        <Pagination.Prev
+                          disabled={currentPage === 1}
+                          onClick={() => handlePageChange(currentPage - 1)}
+                        />
                         {Array.from({ length: totalPages }, (_, i) => (
-                          <li
-                            key={i}
-                            className={`page-item ${
-                              currentPage === i + 1 ? "active" : ""
-                            }`}
+                          <Pagination.Item
+                            key={i + 1}
+                            active={currentPage === i + 1}
+                            onClick={() => handlePageChange(i + 1)}
                           >
-                            <Button
-                              variant="link"
-                              className="page-link"
-                              onClick={() => handlePageChange(i + 1)}
-                            >
-                              {i + 1}
-                            </Button>
-                          </li>
+                            {i + 1}
+                          </Pagination.Item>
                         ))}
-                      </ul>
+                        <Pagination.Next
+                          disabled={currentPage === totalPages}
+                          onClick={() => handlePageChange(currentPage + 1)}
+                        />
+                      </Pagination>
                     </div>
                   )}
                 </>

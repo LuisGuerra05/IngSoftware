@@ -13,6 +13,7 @@ function AppNavbar() {
   const location = useLocation();
   const navigate = useNavigate();
   const user = JSON.parse(localStorage.getItem("user") || "{}");
+  const usuarioEmail = localStorage.getItem("usuario") || "usuario@alumnos.uai.cl";
 
   // Mostrar / ocultar navbar según scroll
   useEffect(() => {
@@ -140,15 +141,7 @@ function AppNavbar() {
           <h5 className="perfil-titulo">Sesión activa</h5>
 
           <p className="perfil-email">
-            <strong>{user.email}</strong>
-          </p>
-
-          <p className="perfil-fecha">
-            Último acceso: {new Date().toLocaleDateString("es-CL")}{" "}
-            {new Date().toLocaleTimeString("es-CL", {
-              hour: "2-digit",
-              minute: "2-digit",
-            })}
+            <strong>{usuarioEmail}</strong>
           </p>
 
           <div className="text-center mt-4">

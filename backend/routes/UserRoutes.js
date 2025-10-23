@@ -40,4 +40,43 @@ router.post('/login', async (req, res) => {
   }
 });
 
+// ===================================================
+// 🔹 Guardar ramos seleccionados del usuario
+// ===================================================
+router.put("/mis-ramos", requireAuth, async (req, res) => {
+  try {
+    const userId = req.user.sub; // viene del JWT
+    const { ramos } = req.body; // array de IDs de cursos
+
+    if (!Array.isArray(ramos)) {
+      return res.status(400).json({ error: "Formato inválido de ramos" });
+    }
+
+    const user = await User.findByIdAndUpdate(
+      userId,
+      { misRamos: ramos },
+      { new: true }
+    ).populate("misRamos");
+
+    res.json({ ok: true, misRamos: user.misRamos });
+  } catch (err) {
+    console.error("❌ Error guardando ramos:", err);
+    res.status(500).json({ error: "Error guardando ramos del usuario" });
+  }
+});
+
+// ===================================================
+// 🔹 Obtener ramos guardados del usuario
+// ===================================================
+router.get("/mis-ramos", requireAuth, async (req, res) => {
+  try {
+    const userId = req.user.sub;
+    const user = await User.findById(userId).populate("misRamos");
+    res.json({ ok: true, misRamos: user.misRamos });
+  } catch (err) {
+    console.error("❌ Error obteniendo ramos:", err);
+    res.status(500).json({ error: "Error obteniendo ramos del usuario" });
+  }
+});
+
 module.exports = router;

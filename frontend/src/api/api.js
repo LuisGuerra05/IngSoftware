@@ -44,3 +44,20 @@ export async function search(q) {
   const { data } = await axios.get(`/search`, { params: { q } });
   return data; // { profesores: [], cursos: [] }
 }
+
+// --- Mis Ramos (usuario) ---
+export async function getMisRamos(token) {
+  const { data } = await axios.get("/mis-ramos", {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  return data.misRamos;
+}
+
+export async function saveMisRamos(token, ramosIds) {
+  const { data } = await axios.put(
+    "/mis-ramos",
+    { ramos: ramosIds },
+    { headers: { Authorization: `Bearer ${token}` } }
+  );
+  return data.misRamos;
+}

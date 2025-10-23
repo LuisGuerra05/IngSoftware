@@ -47,7 +47,6 @@ function Login() {
 
       // 🔹 Guardar token y usuario completo
       localStorage.setItem('token', data.token);
-      localStorage.setItem('user', JSON.stringify(data.user));
 
       // 🔹 Guardar email del usuario para mostrarlo en otras vistas
       if (data.user?.email) {

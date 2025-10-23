@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState } from "react";
 import { getCursos, getCursoById, getMisRamos, saveMisRamos } from "../api/api";
 import {
   Card,
@@ -11,13 +11,13 @@ import {
   Badge,
   Alert,
   Pagination,
+  Form,
 } from "react-bootstrap";
 import ModalAsignatura from "../components/modalAsignatura";
 import "./MisAsignaturas.css";
-import { search } from "../api/api";
-import { Form, ListGroup } from "react-bootstrap";
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from "react-router-dom";
 import "./Home.css";
+import NoResults from "../components/NoResults";
 
 export default function MisAsignaturas() {
   const [cursos, setCursos] = useState([]);
@@ -26,37 +26,18 @@ export default function MisAsignaturas() {
   const [cursoSeleccionado, setCursoSeleccionado] = useState(null);
   const [misRamos, setMisRamos] = useState([]);
   const [modoSeleccion, setModoSeleccion] = useState(false);
-  const [query, setQuery] = useState('');
-  const [suggestions, setSuggestions] = useState([]);
-  const debounceRef = useRef(null);
-  const [courseFilterId, setCourseFilterId] = useState(null);
+  const [query, setQuery] = useState("");
   const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 9;
+  const navigate = useNavigate();
   const MAX_RAMOS = 8;
 
-  // 🔹 Obtener email y token del usuario logeado
+  // 🔹 Usuario
   const usuarioEmail = localStorage.getItem("usuario") || "usuario@alumnos.uai.cl";
   const token = localStorage.getItem("token");
 
-  // 🔹 Paginación
-  const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 9;
-  const indexOfLastItem = currentPage * itemsPerPage;
-  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = modoSeleccion
-    ? cursos.slice(indexOfFirstItem, indexOfLastItem)
-    : misRamos.slice(indexOfFirstItem, indexOfLastItem);
-  const totalPages = Math.ceil(
-    (modoSeleccion ? cursos.length : misRamos.length) / itemsPerPage
-  );
-
-  // Items a mostrar teniendo en cuenta el filtro por curso (si aplica)
-  const displayedItems = modoSeleccion
-    ? (courseFilterId ? cursos.filter(c => c._id === courseFilterId) : currentItems)
-    : (courseFilterId ? misRamos.filter(c => c._id === courseFilterId) : currentItems);
-
-  const handlePageChange = (pageNumber) => setCurrentPage(pageNumber);
-
-  // 🔹 Cargar todos los cursos y los ramos del usuario
+  // 🔹 Cargar cursos y ramos del usuario
   useEffect(() => {
     async function cargarDatos() {
       try {
@@ -66,7 +47,6 @@ export default function MisAsignaturas() {
         );
         setCursos(sorted);
 
-        // Si hay token, obtener ramos del usuario desde BD
         if (token) {
           const ramosBD = await getMisRamos(token);
           if (ramosBD && ramosBD.length > 0) {
@@ -77,7 +57,6 @@ export default function MisAsignaturas() {
             setModoSeleccion(true);
           }
         } else {
-          // Si no hay token, usar lo del localStorage
           const ramosLocal = JSON.parse(localStorage.getItem("misRamos") || "[]");
           setMisRamos(ramosLocal);
           setModoSeleccion(ramosLocal.length === 0);
@@ -88,85 +67,81 @@ export default function MisAsignaturas() {
         setLoading(false);
       }
     }
-
     cargarDatos();
   }, [token]);
 
-  // buscar sugerencias de cursos para MisAsignaturas
-  useEffect(() => {
-    if (!query.trim()) {
-      setSuggestions([]);
-      return;
-    }
-    if (debounceRef.current) clearTimeout(debounceRef.current);
-    debounceRef.current = setTimeout(() => {
-      search(query).then(data => setSuggestions(data.cursos || [])).catch(err => console.error(err));
-    }, 300);
-    return () => clearTimeout(debounceRef.current);
-  }, [query]);
+  // 🔹 Normalizar texto para búsqueda
+  const normalize = (str) =>
+    str?.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase() || "";
 
-  const applyCourseFilter = (id) => {
-    setCourseFilterId(id);
-    setQuery('');
-    setSuggestions([]);
-    setCurrentPage(1);
-  };
+  // 🔹 Filtrar localmente
+  const dataToShow = modoSeleccion ? cursos : misRamos;
+  const filteredCursos = dataToShow.filter(
+    (c) =>
+      normalize(c.nombre).includes(normalize(query)) ||
+      normalize(c.codigo).includes(normalize(query))
+  );
 
-  const clearCourseFilter = () => setCourseFilterId(null);
+  // 🔹 Paginación
+  const totalPages = Math.ceil(filteredCursos.length / itemsPerPage);
+  const paginatedCursos = filteredCursos.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
+  const handlePageChange = (pageNumber) => setCurrentPage(pageNumber);
 
+  // 🔹 Modal de detalle
   const handleOpenModal = async (curso) => {
-  try {
-    const cursoCompleto = await getCursoById(curso._id);
-    setCursoSeleccionado(cursoCompleto);
+    try {
+      const cursoCompleto = await getCursoById(curso._id);
+      setCursoSeleccionado(cursoCompleto);
+    } catch {
+      setCursoSeleccionado(curso);
+    }
     setShowModal(true);
-  } catch (err) {
-    console.error("❌ Error cargando detalle del curso:", err);
-    setCursoSeleccionado(curso);
-    setShowModal(true);
-  }
-};
-
+  };
   const handleCloseModal = () => {
     setShowModal(false);
     setCursoSeleccionado(null);
   };
 
-  const navigate = useNavigate();
+  // 🔹 Selección de ramos
+  const estaSeleccionado = (cursoId) => misRamos.some((r) => r._id === cursoId);
 
   const handleSeleccionarRamo = (curso) => {
     if (misRamos.find((r) => r._id === curso._id)) {
-      const nuevosRamos = misRamos.filter((r) => r._id !== curso._id);
-      setMisRamos(nuevosRamos);
-      localStorage.setItem("misRamos", JSON.stringify(nuevosRamos));
+      const nuevos = misRamos.filter((r) => r._id !== curso._id);
+      setMisRamos(nuevos);
+      localStorage.setItem("misRamos", JSON.stringify(nuevos));
     } else if (misRamos.length < MAX_RAMOS) {
-      const nuevosRamos = [...misRamos, curso];
-      setMisRamos(nuevosRamos);
-      localStorage.setItem("misRamos", JSON.stringify(nuevosRamos));
+      const nuevos = [...misRamos, curso];
+      setMisRamos(nuevos);
+      localStorage.setItem("misRamos", JSON.stringify(nuevos));
     }
   };
 
-  // 🔹 Guardar en BD cuando se confirma
+  // 🔹 Confirmar selección (guardar en BD)
   const handleConfirmarSeleccion = async () => {
     if (misRamos.length > 0) {
       try {
         if (token) {
           const ids = misRamos.map((r) => r._id);
           await saveMisRamos(token, ids);
-          console.log("✅ Ramos guardados correctamente en la base de datos");
+          console.log("✅ Ramos guardados correctamente");
         }
       } catch (err) {
-        console.error("❌ Error guardando ramos en BD:", err);
+        console.error("❌ Error guardando ramos:", err);
       }
       setModoSeleccion(false);
       setCurrentPage(1);
     }
   };
 
+  // 🔹 Limpiar ramos
   const handleLimpiarRamos = () => setShowConfirmModal(true);
-
   const confirmarLimpiar = async () => {
     try {
-      if (token) await saveMisRamos(token, []); // limpia BD también
+      if (token) await saveMisRamos(token, []);
     } catch (err) {
       console.error("❌ Error al limpiar ramos:", err);
     }
@@ -177,51 +152,37 @@ export default function MisAsignaturas() {
     setCurrentPage(1);
   };
 
-  const estaSeleccionado = (cursoId) => misRamos.some((r) => r._id === cursoId);
-
   // 🔹 Render principal
   return (
     <Container style={{ marginTop: 100, marginBottom: 50 }}>
-      {/* 🔹 Título con misma línea que Asignaturas */}
+      {/* Encabezado */}
       <div className="d-flex justify-content-between align-items-center mb-4">
         <div style={{ flex: 1 }}>
           <h2 className="fw-bold mb-0">Mis Asignaturas</h2>
           <div className="linea-azul"></div>
         </div>
 
-        <div style={{ maxWidth: 420, width: '100%', marginLeft: 16 }}>
-          {(!modoSeleccion && misRamos.length > 0) ? (
-            <div className="d-flex justify-content-end">
-              <Button className="btn-ver-todas" onClick={() => navigate('/asignaturas')}>
-                Ver todas las asignaturas
-              </Button>
-            </div>
-          ) : (
-            <>
-              <Form className="d-flex gap-2">
-                <Form.Control
-                  placeholder="Buscar asignaturas..."
-                  value={query}
-                  onChange={(e) => setQuery(e.target.value)}
-                />
-                {courseFilterId && (
-                  <Button variant="outline-secondary" onClick={clearCourseFilter}>
-                    Limpiar filtro
-                  </Button>
-                )}
-              </Form>
-              {query.trim() !== '' && suggestions.length > 0 && (
-                <ListGroup className={`mt-2 suggestion-list ${suggestions.length > 3 ? 'scrollable' : ''}`}>
-                  {suggestions.map(s => (
-                    <ListGroup.Item key={s._id} action onClick={() => applyCourseFilter(s._id)}>
-                      {s.nombre} <small className="text-muted">{s.codigo}</small>
-                    </ListGroup.Item>
-                  ))}
-                </ListGroup>
+        {/* 🔹 Barra de búsqueda solo visible en modo selección */}
+        {modoSeleccion && (
+          <div style={{ maxWidth: 420, width: "100%", marginLeft: 16 }}>
+            <Form className="d-flex gap-2">
+              <Form.Control
+                placeholder="Buscar asignaturas..."
+                value={query}
+                onChange={(e) => {
+                  setQuery(e.target.value);
+                  setCurrentPage(1);
+                }}
+              />
+              {query && (
+                <Button variant="outline-secondary" onClick={() => setQuery("")}>
+                  Limpiar
+                </Button>
               )}
-            </>
-          )}
-        </div>
+            </Form>
+          </div>
+        )}
+
 
         {!modoSeleccion && misRamos.length > 0 && (
           <Button className="btn-limpiar-ramos" onClick={handleLimpiarRamos}>
@@ -236,6 +197,7 @@ export default function MisAsignaturas() {
         </p>
       )}
 
+      {/* Contenido principal */}
       {loading ? (
         <div className="text-center mt-5">
           <Spinner animation="border" />
@@ -248,16 +210,17 @@ export default function MisAsignaturas() {
                 <strong>Selecciona tus asignaturas</strong> (máximo {MAX_RAMOS} ramos)
                 <br />
                 Haz clic en las tarjetas para seleccionar o deseleccionar.{" "}
-                Has seleccionado: <strong>{misRamos.length}/{MAX_RAMOS}</strong>
+                Has seleccionado:{" "}
+                <strong>
+                  {misRamos.length}/{MAX_RAMOS}
+                </strong>
               </Alert>
 
               <Row>
-                {cursos.length === 0 ? (
-                  <p className="text-center text-muted mt-5">
-                    No se encontraron asignaturas disponibles.
-                  </p>
+                {filteredCursos.length === 0 ? (
+                  <NoResults query={query} message="No se encontraron asignaturas disponibles" />
                 ) : (
-                  displayedItems.map((curso) => {
+                  paginatedCursos.map((curso) => {
                     const seleccionado = estaSeleccionado(curso._id);
                     return (
                       <Col key={curso._id} md={6} lg={4} className="mb-4">
@@ -267,11 +230,8 @@ export default function MisAsignaturas() {
                           }`}
                           onClick={() => handleSeleccionarRamo(curso)}
                           style={{
-                            cursor: "pointer",
                             opacity:
-                              !seleccionado && misRamos.length >= MAX_RAMOS
-                                ? 0.5
-                                : 1,
+                              !seleccionado && misRamos.length >= MAX_RAMOS ? 0.5 : 1,
                             position: "relative",
                           }}
                         >
@@ -306,14 +266,9 @@ export default function MisAsignaturas() {
                 )}
               </Row>
 
-              {/* 🔹 Paginación */}
               {totalPages > 1 && (
                 <div className="d-flex justify-content-center mt-3">
                   <Pagination>
-                    <Pagination.Prev
-                      disabled={currentPage === 1}
-                      onClick={() => handlePageChange(currentPage - 1)}
-                    />
                     {Array.from({ length: totalPages }, (_, i) => (
                       <Pagination.Item
                         key={i + 1}
@@ -323,10 +278,6 @@ export default function MisAsignaturas() {
                         {i + 1}
                       </Pagination.Item>
                     ))}
-                    <Pagination.Next
-                      disabled={currentPage === totalPages}
-                      onClick={() => handlePageChange(currentPage + 1)}
-                    />
                   </Pagination>
                 </div>
               )}
@@ -350,47 +301,45 @@ export default function MisAsignaturas() {
                   <p className="text-muted">
                     No has seleccionado ninguna asignatura aún.
                   </p>
-                  <Button
-                    variant="primary"
-                    onClick={() => setModoSeleccion(true)}
-                  >
+                  <Button variant="primary" onClick={() => setModoSeleccion(true)}>
                     Seleccionar Asignaturas
                   </Button>
                 </div>
               ) : (
                 <>
                   <Row>
-                    {displayedItems.map((curso) => (
-                      <Col key={curso._id} md={6} lg={4} className="mb-4">
-                        <Card
-                          className="shadow-sm h-100 cursor-pointer"
-                          onClick={() => handleOpenModal(curso)}
-                        >
-                          <Card.Body>
-                            <Card.Title>{curso.nombre}</Card.Title>
-                            <Card.Subtitle className="text-muted mb-2">
-                              Código: {curso.codigo}
-                            </Card.Subtitle>
-                            <Card.Text className="asignatura-profes">
-                              <strong>Profesores:</strong>{" "}
-                              <span className="badge-count">
-                                {curso.profesores?.length || 0}
-                              </span>
-                            </Card.Text>
-                          </Card.Body>
-                        </Card>
-                      </Col>
-                    ))}
+                    {filteredCursos.length === 0 ? (
+                      <p className="text-center text-muted mt-5">
+                        No se encontraron asignaturas.
+                      </p>
+                    ) : (
+                      paginatedCursos.map((curso) => (
+                        <Col key={curso._id} md={6} lg={4} className="mb-4">
+                          <Card
+                            className="shadow-sm h-100 cursor-pointer"
+                            onClick={() => handleOpenModal(curso)}
+                          >
+                            <Card.Body>
+                              <Card.Title>{curso.nombre}</Card.Title>
+                              <Card.Subtitle className="text-muted mb-2">
+                                Código: {curso.codigo}
+                              </Card.Subtitle>
+                              <Card.Text className="asignatura-profes">
+                                <strong>Profesores:</strong>{" "}
+                                <span className="badge-count">
+                                  {curso.profesores?.length || 0}
+                                </span>
+                              </Card.Text>
+                            </Card.Body>
+                          </Card>
+                        </Col>
+                      ))
+                    )}
                   </Row>
 
-                  {/* 🔹 Paginación igual a Asignaturas */}
                   {totalPages > 1 && (
                     <div className="d-flex justify-content-center mt-3">
                       <Pagination>
-                        <Pagination.Prev
-                          disabled={currentPage === 1}
-                          onClick={() => handlePageChange(currentPage - 1)}
-                        />
                         {Array.from({ length: totalPages }, (_, i) => (
                           <Pagination.Item
                             key={i + 1}
@@ -400,10 +349,6 @@ export default function MisAsignaturas() {
                             {i + 1}
                           </Pagination.Item>
                         ))}
-                        <Pagination.Next
-                          disabled={currentPage === totalPages}
-                          onClick={() => handlePageChange(currentPage + 1)}
-                        />
                       </Pagination>
                     </div>
                   )}
@@ -414,14 +359,13 @@ export default function MisAsignaturas() {
         </>
       )}
 
-      {/* Modal con detalle del curso */}
+      {/* Modal de detalle */}
       <ModalAsignatura
         show={showModal}
         handleClose={handleCloseModal}
         asignatura={cursoSeleccionado}
       />
 
-      {/* Modal de confirmación */}
       {/* Modal de confirmación elegante (idéntico al de eliminar evaluación) */}
       <Modal
         show={showConfirmModal}

@@ -1,11 +1,10 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState } from "react";
 import { getCursos } from "../api/api";
-import { Card, Container, Row, Col, Spinner, Pagination } from "react-bootstrap";
+import { Card, Container, Row, Col, Spinner, Pagination, Form, Button } from "react-bootstrap";
 import ModalAsignatura from "../components/modalAsignatura";
 import { useLocation } from "react-router-dom";
-import { search } from "../api/api";
-import { Form, ListGroup, Button } from "react-bootstrap";
 import "./Home.css";
+import NoResults from "../components/NoResults";
 
 export default function Asignaturas() {
   const [cursos, setCursos] = useState([]);
@@ -13,11 +12,8 @@ export default function Asignaturas() {
   const [showModal, setShowModal] = useState(false);
   const [cursoSeleccionado, setCursoSeleccionado] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
+  const [query, setQuery] = useState("");
   const itemsPerPage = 9;
-  const [query, setQuery] = useState('');
-  const [suggestions, setSuggestions] = useState([]);
-  const debounceRef = useRef(null);
-  const [courseFilterId, setCourseFilterId] = useState(null);
 
   useEffect(() => {
     getCursos()
@@ -31,35 +27,30 @@ export default function Asignaturas() {
       .finally(() => setLoading(false));
   }, []);
 
-  // buscar solo cursos para sugerencias
-  useEffect(() => {
-    if (!query.trim()) {
-      setSuggestions([]);
-      return;
-    }
-    if (debounceRef.current) clearTimeout(debounceRef.current);
-    debounceRef.current = setTimeout(() => {
-      search(query).then(data => setSuggestions(data.cursos || [])).catch(err => console.error(err));
-    }, 300);
-    return () => clearTimeout(debounceRef.current);
-  }, [query]);
+  // 🔹 Filtro local
+  const normalize = (str) =>
+    str?.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase() || "";
 
-  const applyCourseFilter = (id) => {
-    setCourseFilterId(id);
-    setQuery('');
-    setSuggestions([]);
-    setCurrentPage(1);
-  };
+  const filteredCursos = cursos.filter(
+    (c) =>
+      normalize(c.nombre).includes(normalize(query)) ||
+      normalize(c.codigo).includes(normalize(query))
+  );
 
-  const clearCourseFilter = () => setCourseFilterId(null);
+  const paginatedCursos = filteredCursos.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
+  const totalPages = Math.ceil(filteredCursos.length / itemsPerPage);
 
-  // Abrir modal si existe query param ?id=
+  const handlePageChange = (page) => setCurrentPage(page);
+
   const location = useLocation();
   useEffect(() => {
     const params = new URLSearchParams(location.search);
-    const id = params.get('id');
+    const id = params.get("id");
     if (id && cursos.length > 0) {
-      const found = cursos.find(c => c._id === id);
+      const found = cursos.find((c) => c._id === id);
       if (found) {
         setCursoSeleccionado(found);
         setShowModal(true);
@@ -77,40 +68,26 @@ export default function Asignaturas() {
     setCursoSeleccionado(null);
   };
 
-  // 🔹 Paginación
-  const indexOfLast = currentPage * itemsPerPage;
-  const indexOfFirst = indexOfLast - itemsPerPage;
-  const currentCursos = cursos.slice(indexOfFirst, indexOfLast);
-  const totalPages = Math.ceil(cursos.length / itemsPerPage);
-
-  const handlePageChange = (page) => setCurrentPage(page);
-
   return (
     <Container style={{ marginTop: 100 }}>
       <div className="d-flex align-items-center justify-content-between mb-3">
         <h2 className="mb-0 fw-bold">Asignaturas</h2>
-        <div style={{ maxWidth: 420, width: '100%' }}>
+        <div style={{ maxWidth: 420, width: "100%" }}>
           <Form className="d-flex gap-2">
             <Form.Control
               placeholder="Buscar asignaturas..."
               value={query}
-              onChange={(e) => setQuery(e.target.value)}
+              onChange={(e) => {
+                setQuery(e.target.value);
+                setCurrentPage(1);
+              }}
             />
-            {courseFilterId && (
-              <Button variant="outline-secondary" onClick={clearCourseFilter}>
-                Limpiar filtro
+            {query && (
+              <Button variant="outline-secondary" onClick={() => setQuery("")}>
+                Limpiar
               </Button>
             )}
           </Form>
-          {query.trim() !== '' && suggestions.length > 0 && (
-            <ListGroup className={`mt-2 suggestion-list ${suggestions.length > 3 ? 'scrollable' : ''}`}>
-              {suggestions.map(s => (
-                <ListGroup.Item key={s._id} action onClick={() => applyCourseFilter(s._id)}>
-                  {s.nombre} <small className="text-muted">{s.codigo}</small>
-                </ListGroup.Item>
-              ))}
-            </ListGroup>
-          )}
         </div>
       </div>
 
@@ -121,12 +98,10 @@ export default function Asignaturas() {
       ) : (
         <>
           <Row>
-            {cursos.length === 0 ? (
-              <p className="text-center text-muted mt-5">
-                No se encontraron asignaturas.
-              </p>
-              ) : (
-              (courseFilterId ? cursos.filter(c => c._id === courseFilterId) : currentCursos).map((curso) => (
+            {filteredCursos.length === 0 ? (
+              <NoResults query={query} message="No se encontraron asignaturas" />
+            ) : (
+              paginatedCursos.map((curso) => (
                 <Col key={curso._id} md={6} lg={4} className="mb-4">
                   <Card
                     className="shadow-sm h-100 cursor-pointer"
@@ -150,7 +125,6 @@ export default function Asignaturas() {
             )}
           </Row>
 
-          {/* 🔹 Paginación */}
           {totalPages > 1 && (
             <div className="d-flex justify-content-center mt-4">
               <Pagination>
@@ -177,7 +151,6 @@ export default function Asignaturas() {
         </>
       )}
 
-      {/* Modal con detalle */}
       <ModalAsignatura
         show={showModal}
         handleClose={handleCloseModal}

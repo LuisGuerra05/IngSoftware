@@ -51,7 +51,12 @@ export default function MisAsignaturas() {
   // 🔹 Cargar todos los cursos disponibles
   useEffect(() => {
     getCursos()
-      .then((data) => setCursos(data))
+      .then((data) => {
+        const sorted = [...data].sort((a, b) =>
+          a.nombre.localeCompare(b.nombre, "es", { sensitivity: "base" })
+        );
+        setCursos(sorted);
+      })
       .catch((err) => console.error(err))
       .finally(() => setLoading(false));
   }, []);

@@ -16,7 +16,10 @@ export default function Profesores() {
     getProfesores()
       .then((data) => {
         console.log("✅ Profesores recibidos desde backend:", data);
-        setProfesores(data);
+        const sorted = [...data].sort((a, b) =>
+          a.nombre.localeCompare(b.nombre, "es", { sensitivity: "base" })
+        );
+        setProfesores(sorted);
       })
       .catch((err) => {
         console.error("❌ Error obteniendo profesores:", err);

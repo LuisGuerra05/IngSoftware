@@ -44,7 +44,8 @@ function Home() {
   };
 
   const handleSelectCurso = (id) => {
-    navigate(`/asignaturas`); // actualmente no hay detalle individual de curso
+    // Navegar a Asignaturas y pasar id en query para abrir el modal
+    navigate(`/asignaturas?id=${id}`);
   };
 
   return (

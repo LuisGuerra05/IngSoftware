@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { getCursos } from "../api/api";
 import { Card, Container, Row, Col, Spinner, Pagination } from "react-bootstrap";
 import ModalAsignatura from "../components/modalAsignatura";
+import { useLocation } from "react-router-dom";
 
 export default function Asignaturas() {
   const [cursos, setCursos] = useState([]);
@@ -22,6 +23,20 @@ export default function Asignaturas() {
       .catch((err) => console.error(err))
       .finally(() => setLoading(false));
   }, []);
+
+  // Abrir modal si existe query param ?id=
+  const location = useLocation();
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const id = params.get('id');
+    if (id && cursos.length > 0) {
+      const found = cursos.find(c => c._id === id);
+      if (found) {
+        setCursoSeleccionado(found);
+        setShowModal(true);
+      }
+    }
+  }, [location.search, cursos]);
 
   const handleOpenModal = (curso) => {
     setCursoSeleccionado(curso);

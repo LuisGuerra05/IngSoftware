@@ -13,11 +13,18 @@ const UserSchema = new mongoose.Schema(
     },
     passwordHash: { type: String, required: true },
 
-    // 🔹 Nuevo campo: ramos seleccionados del semestre
+    // 🔹 Nuevo campo de rol
+    role: {
+      type: String,
+      enum: ["admin", "estudiante"],
+      default: "estudiante",
+    },
+
+    // 🔹 Ramos seleccionados
     misRamos: [
       {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "Curso", // referencia a tu modelo de cursos
+        ref: "Curso",
       },
     ],
   },

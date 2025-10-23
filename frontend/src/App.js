@@ -9,13 +9,13 @@ import Profesores from "./pages/Profesores";
 import Asignaturas from "./pages/Asignaturas";
 import MisAsignaturas from "./pages/MisAsignaturas";
 import DetalleProfe from "./pages/DetalleProfe";
+import Moderacion from "./pages/Moderacion";
 import Layout from "./components/Layout";
 import "./App.css";
 
 export default function App() {
   const { logout } = useAuth();
 
-  // 🔹 Vincula el logout del contexto con axios
   useEffect(() => {
     setLogoutHandler(() => logout);
   }, [logout]);
@@ -73,6 +73,19 @@ export default function App() {
           </ProtectedRoute>
         }
       />
+
+      {/* 🔹 Solo admin puede acceder */}
+      <Route
+        path="/moderacion"
+        element={
+          <ProtectedRoute requiredRole="admin">
+            <Layout>
+              <Moderacion />
+            </Layout>
+          </ProtectedRoute>
+        }
+      />
+
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );

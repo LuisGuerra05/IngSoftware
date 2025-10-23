@@ -45,12 +45,17 @@ function Login() {
         throw new Error(data?.error || 'Correo o contraseña incorrecta');
       }
 
-      // 🔹 Guardar token y usuario completo
+      // 🔹 Guardar token
       localStorage.setItem('token', data.token);
 
-      // 🔹 Guardar email del usuario para mostrarlo en otras vistas
+      // 🔹 Guardar email del usuario
       if (data.user?.email) {
         localStorage.setItem('usuario', data.user.email);
+      }
+
+      // 🔹 Guardar rol del usuario
+      if (data.user?.role) {
+        localStorage.setItem('role', data.user.role);
       }
 
       // Redirigir al home

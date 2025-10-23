@@ -28,12 +28,21 @@ router.post('/login', async (req, res) => {
     }
 
     const token = require('jsonwebtoken').sign(
-      { sub: String(user._id), email: user.email },
+      { sub: String(user._id), email: user.email, role: user.role},
       process.env.JWT_SECRET,
-      { expiresIn: process.env.JWT_EXPIRES_IN || '2h' }
+      { expiresIn: process.env.JWT_EXPIRES_IN || '24h' }
     );
 
-    return res.json({ ok: true, token, user: { id: user._id, email: user.email } });
+    return res.json({ 
+      ok: true, 
+      token, 
+      user: { 
+        id: user._id, 
+        email: user.email, 
+        role: user.role
+      } 
+    });
+
   } catch (err) {
     console.error('Error en login:', err);
     return res.status(500).json({ error: 'Error en login' });

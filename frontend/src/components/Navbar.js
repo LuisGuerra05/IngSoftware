@@ -3,7 +3,7 @@ import { Navbar, Nav, Container, Modal, Button } from "react-bootstrap";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { PersonCircle } from "react-bootstrap-icons";
 import "./Navbar.css";
-import "./ModalPerfil.css"; // ✅ nuevo CSS para el modal de perfil
+import "./ModalPerfil.css";
 
 function AppNavbar() {
   const [show, setShow] = useState(true);
@@ -12,10 +12,9 @@ function AppNavbar() {
   const lastScroll = useRef(window.scrollY);
   const location = useLocation();
   const navigate = useNavigate();
-  const user = JSON.parse(localStorage.getItem("user") || "{}");
   const usuarioEmail = localStorage.getItem("usuario") || "usuario@alumnos.uai.cl";
+  const role = localStorage.getItem("role"); // 🔹 Obtener rol del usuario
 
-  // Mostrar / ocultar navbar según scroll
   useEffect(() => {
     const handleScroll = () => {
       const current = window.scrollY;
@@ -27,16 +26,12 @@ function AppNavbar() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // Cerrar el collapse al cambiar de ruta
-  useEffect(() => {
-    setExpanded(false);
-  }, [location.pathname]);
-
-  const handleNavClick = () => setExpanded(false);
+  useEffect(() => setExpanded(false), [location.pathname]);
 
   const handleLogout = () => {
     localStorage.removeItem("token");
-    localStorage.removeItem("user");
+    localStorage.removeItem("usuario");
+    localStorage.removeItem("role");
     navigate("/login");
   };
 
@@ -52,7 +47,6 @@ function AppNavbar() {
         fixed="top"
       >
         <Container>
-          {/* 🔹 Logo clickable */}
           <Navbar.Brand as={Link} to="/" onClick={() => window.scrollTo(0, 0)}>
             <img
               src="/img/Logo.png"
@@ -73,7 +67,6 @@ function AppNavbar() {
                 as={Link}
                 to="/profesores"
                 active={location.pathname === "/profesores"}
-                onClick={handleNavClick}
                 className="py-2"
               >
                 Profesores
@@ -83,7 +76,6 @@ function AppNavbar() {
                 as={Link}
                 to="/asignaturas"
                 active={location.pathname === "/asignaturas"}
-                onClick={handleNavClick}
                 className="py-2"
               >
                 Asignaturas
@@ -93,21 +85,39 @@ function AppNavbar() {
                 as={Link}
                 to="/mis-asignaturas"
                 active={location.pathname === "/mis-asignaturas"}
-                onClick={handleNavClick}
                 className="py-2"
               >
                 Mis Asignaturas
               </Nav.Link>
+
+              {/* 🔹 Solo visible para administradores */}
+              {role === "admin" && (
+                <Nav.Link
+                  as={Link}
+                  to="/moderacion"
+                  active={location.pathname === "/moderacion"}
+                  className={`py-2 fw-bold ${
+                    location.pathname === "/moderacion"
+                      ? "text-primary"
+                      : "text-dark-blue"
+                  }`}
+                  style={{
+                    fontWeight: "600",
+                    color:
+                      location.pathname === "/moderacion"
+                        ? "#005fa3"
+                        : "#002b5c",
+                  }}
+                >
+                  Moderación
+                </Nav.Link>
+              )}
             </Nav>
 
-            {/* 🔹 Ícono perfil */}
+            {/* 🔹 Ícono de perfil */}
             <div
               onClick={() => setShowModal(true)}
-              style={{
-                cursor: "pointer",
-                display: "flex",
-                alignItems: "center",
-              }}
+              style={{ cursor: "pointer", display: "flex", alignItems: "center" }}
               title="Ver perfil"
             >
               <PersonCircle size={36} color="#333" />
@@ -116,15 +126,8 @@ function AppNavbar() {
         </Container>
       </Navbar>
 
-      {/* 🔹 Modal Perfil estilizado */}
-      <Modal
-        show={showModal}
-        onHide={() => setShowModal(false)}
-        centered
-        className="modal-perfil"
-        backdrop={true}
-        keyboard={true}
-      >
+      {/* Modal perfil */}
+      <Modal show={showModal} onHide={() => setShowModal(false)} centered className="modal-perfil">
         <div className="modal-perfil-header">
           <Modal.Header closeButton closeVariant="white">
             <Modal.Title>Perfil del Usuario</Modal.Title>
@@ -132,17 +135,17 @@ function AppNavbar() {
         </div>
 
         <div className="modal-perfil-body text-center">
-          <img
-            src="/img/Logo.png"
-            alt="Logo Calificador de Profesores"
-            className="perfil-logo"
-          />
-
+          <img src="/img/Logo.png" alt="Logo Calificador de Profesores" className="perfil-logo" />
           <h5 className="perfil-titulo">Sesión activa</h5>
-
           <p className="perfil-email">
             <strong>{usuarioEmail}</strong>
           </p>
+
+          {role && (
+            <p className="text-muted" style={{ fontSize: "0.9rem" }}>
+              Rol: <strong>{role}</strong>
+            </p>
+          )}
 
           <div className="text-center mt-4">
             <Button onClick={handleLogout} className="btn-cerrar-sesion">

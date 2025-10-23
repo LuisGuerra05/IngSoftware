@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import {
   getProfesorById,
   getCursoById,
@@ -13,8 +13,15 @@ import {
   Row,
   Col,
   Button,
+  Toast,
+  ToastContainer,
 } from "react-bootstrap";
-import { Mortarboard, BoxArrowUpRight } from "react-bootstrap-icons";
+import {
+  Mortarboard,
+  BoxArrowUpRight,
+  CheckCircle,
+  Trash3,
+} from "react-bootstrap-icons";
 import EstadisticasProfe from "../components/EstadisticasProfe";
 import ModalAsignatura from "../components/modalAsignatura";
 import ModalCalificacion from "../components/ModalCalificacion";
@@ -31,9 +38,14 @@ export default function DetalleProfe() {
   const [showModalCalificacion, setShowModalCalificacion] = useState(false);
   const [miCalificacion, setMiCalificacion] = useState(null);
 
+  // ✅ Toast de confirmación
+  const [showToast, setShowToast] = useState(false);
+  const [toastMensaje, setToastMensaje] = useState("");
+  const [toastColor, setToastColor] = useState("success");
+
   const token = localStorage.getItem("token");
 
-  // Cargar datos del profesor, calificaciones y mi reseña
+  // === Cargar datos del profesor y sus calificaciones ===
   const cargarDatos = async () => {
     try {
       const [profData, califData, miCalif] = await Promise.all([
@@ -55,6 +67,7 @@ export default function DetalleProfe() {
     cargarDatos();
   }, [id]);
 
+  // === Manejo de modales ===
   const handleOpenModal = async (curso) => {
     try {
       const cursoCompleto = await getCursoById(curso._id);
@@ -70,15 +83,40 @@ export default function DetalleProfe() {
     setCursoSeleccionado(null);
   };
 
-  const refrescarDatos = async () => {
+  // ✅ Refrescar datos y mostrar toast
+  const refrescarDatos = async (exito, tipo) => {
     await cargarDatos();
+    if (exito) {
+      let mensaje = "";
+      let color = "success";
+
+      if (tipo === "crear") {
+        mensaje = "Evaluación enviada con éxito";
+        color = "success";
+      } else if (tipo === "editar") {
+        mensaje = "Evaluación actualizada correctamente";
+        color = "primary";
+      } else if (tipo === "eliminar") {
+        mensaje = "Evaluación eliminada correctamente";
+        color = "danger";
+      }
+
+      setToastMensaje(mensaje);
+      setToastColor(color);
+      setShowToast(true);
+
+      setTimeout(() => setShowToast(false), 4000);
+    }
   };
 
+  // === Render ===
   if (loading)
     return (
       <Container className="text-center mt-5">
         <Spinner animation="border" />
-        <p className="mt-3 text-muted">Cargando información del profesor...</p>
+        <p className="mt-3 text-muted">
+          Cargando información del profesor...
+        </p>
       </Container>
     );
 
@@ -101,6 +139,7 @@ export default function DetalleProfe() {
       <Container>
         <Card className="detalle-profe-card shadow-sm">
           <Row className="g-4 align-items-start">
+            {/* Columna izquierda */}
             <Col xs={12} md={5} className="detalle-profe-info">
               <h2 className="detalle-profe-nombre">{profesor.nombre}</h2>
               <span className="detalle-profe-campus">{profesor.campus}</span>
@@ -126,10 +165,11 @@ export default function DetalleProfe() {
                 >
                   {miCalificacion ? "Editar Evaluación" : "Evaluar Profesor"}
                 </Button>
-
               </div>
 
-              <h5 className="detalle-profe-subtitulo mt-4">Cursos que imparte</h5>
+              <h5 className="detalle-profe-subtitulo mt-4">
+                Cursos que imparte
+              </h5>
               {profesor.cursos?.length ? (
                 <ul className="detalle-profe-cursos">
                   {profesor.cursos.map((curso) => (
@@ -148,12 +188,40 @@ export default function DetalleProfe() {
                 <p className="text-muted">No hay cursos registrados.</p>
               )}
 
+              {/* === COMENTARIOS === */}
               <div className="comentarios-container mt-4">
                 <h5 className="detalle-profe-subtitulo">Comentarios</h5>
+
+                {/* Comentario propio */}
+                {miCalificacion?.comentario && (
+                  <div className="comentario-item propio mb-3">
+                    <div className="d-flex justify-content-between align-items-center">
+                      <span className="badge bg-primary">Tu comentario</span>
+                      <small className="text-muted">
+                        {new Date(
+                          miCalificacion.updatedAt ||
+                            miCalificacion.createdAt
+                        ).toLocaleDateString("es-CL")}
+                      </small>
+                    </div>
+                    <p className="mt-2 mb-1 fw-semibold">
+                      “{miCalificacion.comentario}”
+                    </p>
+                  </div>
+                )}
+
+                {/* Resto de comentarios */}
                 {comentarios.length > 0 ? (
                   <div className="comentarios-lista">
                     {comentarios.map((c, i) => (
-                      <div key={i} className="comentario-item">
+                      <div
+                        key={i}
+                        className={`comentario-item ${
+                          miCalificacion?.comentario === c.comentario
+                            ? "d-none"
+                            : ""
+                        }`}
+                      >
                         <p className="mb-1">“{c.comentario}”</p>
                         <div className="comentario-fecha">
                           {new Date(c.fecha).toLocaleDateString("es-CL")}
@@ -162,11 +230,14 @@ export default function DetalleProfe() {
                     ))}
                   </div>
                 ) : (
-                  <p className="text-muted">No hay comentarios disponibles.</p>
+                  <p className="text-muted">
+                    No hay comentarios disponibles.
+                  </p>
                 )}
               </div>
             </Col>
 
+            {/* Columna derecha */}
             <Col xs={12} md={7} className="detalle-profe-stats">
               <h5 className="detalle-profe-subtitulo">
                 Estadísticas y valoraciones
@@ -177,12 +248,14 @@ export default function DetalleProfe() {
         </Card>
       </Container>
 
+      {/* Modal asignatura */}
       <ModalAsignatura
         show={showModal}
         handleClose={handleCloseModal}
         asignatura={cursoSeleccionado}
       />
 
+      {/* Modal calificación */}
       <ModalCalificacion
         show={showModalCalificacion}
         handleClose={() => setShowModalCalificacion(false)}
@@ -191,6 +264,31 @@ export default function DetalleProfe() {
         calificacionExistente={miCalificacion}
         onSuccess={refrescarDatos}
       />
+
+      {/* ✅ Toast elegante y fijo */}
+      <ToastContainer
+        position="bottom-end"
+        className="p-3 toast-container-fijo"
+        style={{ zIndex: 1060 }}
+      >
+        <Toast
+          show={showToast}
+          onClose={() => setShowToast(false)}
+          bg={toastColor}
+          delay={4000}
+          autohide
+          className="custom-toast"
+        >
+          <Toast.Body className="d-flex align-items-center text-white fw-semibold">
+            {toastColor === "danger" ? (
+              <Trash3 className="me-2" size={18} />
+            ) : (
+              <CheckCircle className="me-2" size={18} />
+            )}
+            {toastMensaje}
+          </Toast.Body>
+        </Toast>
+      </ToastContainer>
     </div>
   );
 }

@@ -143,6 +143,25 @@
   padding-left: 2rem;
 }
 
+/* ===== Comentario propio destacado ===== */
+.comentario-item.propio {
+  background: #e8f1ff;
+  border: 1px solid #bcd3ff;
+  border-radius: 10px;
+  padding: 0.9rem 1rem;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+}
+
+.comentario-item.propio .badge {
+  font-size: 0.75rem;
+  padding: 0.3rem 0.6rem;
+  border-radius: 6px;
+}
+
+.comentario-item.propio p {
+  color: #003e6b;
+}
+
 /* Animación */
 @keyframes fadeInUp {
   from {
@@ -170,3 +189,51 @@
   }
 }
 
+/* ===== Toast elegante y consistente ===== */
+.toast-container-fijo {
+  position: fixed !important;
+  bottom: 25px;
+  right: 25px;
+  z-index: 2000;
+}
+
+.custom-toast {
+  border: none !important;
+  border-radius: 12px !important;
+  box-shadow: 0 6px 20px rgba(0, 95, 163, 0.25);
+  background: linear-gradient(135deg, #005fa3, #003e6b);
+  color: #fff !important;
+  padding: 0.95rem 1.2rem !important;
+  font-size: 0.95rem;
+  font-weight: 500;
+  animation: fadeInUp 0.4s ease forwards;
+  backdrop-filter: blur(4px);
+}
+
+/* === Variantes === */
+.custom-toast.bg-success {
+  background: linear-gradient(135deg, #009d5a, #007d47) !important;
+  box-shadow: 0 6px 20px rgba(0, 157, 90, 0.25);
+}
+
+.custom-toast.bg-primary {
+  background: linear-gradient(135deg, #005fa3, #003e6b) !important;
+  box-shadow: 0 6px 20px rgba(0, 95, 163, 0.25);
+}
+
+.custom-toast.bg-danger {
+  background: linear-gradient(135deg, #b00020, #6d0015) !important;
+  box-shadow: 0 6px 20px rgba(176, 0, 32, 0.25);
+}
+
+/* Animación de aparición */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(15px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

@@ -202,3 +202,14 @@
   padding-bottom: 0.5rem;
 }
 
+/* Toast centrado con sombra */
+.toast-container {
+  z-index: 2000 !important;
+}
+
+.toast {
+  border-radius: 10px !important;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25) !important;
+  font-size: 0.95rem;
+}
+

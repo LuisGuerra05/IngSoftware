@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Modal, Button, Form, Alert } from "react-bootstrap";
+import { Modal, Button, Form, Spinner } from "react-bootstrap";
 import axios from "../api/axiosInstance";
 import "./ModalCalificacion.css";
 
@@ -25,8 +25,6 @@ export default function ModalCalificacion({
   });
 
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
-  const [success, setSuccess] = useState(false);
 
   useEffect(() => {
     if (calificacionExistente) {
@@ -41,7 +39,6 @@ export default function ModalCalificacion({
         dificultad: calificacionExistente.dificultad,
       });
     } else {
-      // Reiniciar en caso de abrir el modal vacío
       setFormData({
         claridadComunicacion: null,
         dominioContenido: null,
@@ -67,7 +64,6 @@ export default function ModalCalificacion({
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    setError(null);
     try {
       if (calificacionExistente) {
         await axios.put(
@@ -75,38 +71,35 @@ export default function ModalCalificacion({
           formData,
           { headers: { Authorization: `Bearer ${token}` } }
         );
+        onSuccess && onSuccess(true, "editar");
       } else {
         await axios.post(
           "/calificaciones",
           { ...formData, profesorId },
           { headers: { Authorization: `Bearer ${token}` } }
         );
+        onSuccess && onSuccess(true, "crear");
       }
-      setSuccess(true);
-      onSuccess && onSuccess();
-      setTimeout(() => {
-        setSuccess(false);
-        handleClose();
-      }, 1200);
+      handleClose();
     } catch (err) {
-      setError(err.response?.data?.message || "Error al guardar la calificación");
+      console.error("Error al guardar calificación:", err);
+      onSuccess && onSuccess(false);
     } finally {
       setLoading(false);
     }
   };
 
   const handleDelete = async () => {
-    if (
-      window.confirm("¿Seguro que deseas eliminar tu evaluación de este profesor?")
-    ) {
+    if (window.confirm("¿Seguro que deseas eliminar tu evaluación?")) {
       try {
         await axios.delete(`/calificaciones/${calificacionExistente._id}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
-        onSuccess && onSuccess();
+        onSuccess && onSuccess(true, "eliminar");
         handleClose();
-      } catch {
-        alert("Error al eliminar la evaluación");
+      } catch (err) {
+        console.error("Error al eliminar evaluación:", err);
+        onSuccess && onSuccess(false);
       }
     }
   };
@@ -118,11 +111,10 @@ export default function ModalCalificacion({
         {[1, 2, 3, 4, 5].map((num) => (
           <Button
             key={num}
-            variant={
-              formData[name] === num ? "primary" : "outline-primary"
-            }
+            variant={formData[name] === num ? "primary" : "outline-primary"}
             size="sm"
             onClick={() => handleRatingChange(name, num)}
+            disabled={loading}
           >
             {num}
           </Button>
@@ -132,35 +124,14 @@ export default function ModalCalificacion({
   );
 
   return (
-    <Modal
-      show={show}
-      onHide={handleClose}
-      centered
-      className="modal-calificacion"
-    >
+    <Modal show={show} onHide={handleClose} centered className="modal-calificacion">
       <Modal.Header closeButton>
-        <div>
-          <Modal.Title>
-            {calificacionExistente ? "Editar Evaluación" : "Evaluar Profesor"}
-          </Modal.Title>
-          <div className="text-white-50 mt-1 small">
-            {calificacionExistente
-              ? `Editando tu evaluación de ${profesorNombre}`
-              : `Estás evaluando a ${profesorNombre}`}
-          </div>
-        </div>
+        <Modal.Title>
+          {calificacionExistente ? "Editar Evaluación" : "Evaluar Profesor"}
+        </Modal.Title>
       </Modal.Header>
 
       <Modal.Body className="modal-body-scroll">
-        {error && <Alert variant="danger">{error}</Alert>}
-        {success && (
-          <Alert variant="success">
-            {calificacionExistente
-              ? "Evaluación actualizada correctamente"
-              : "Calificación enviada con éxito"}
-          </Alert>
-        )}
-
         <Form onSubmit={handleSubmit}>
           {renderNumericRating("claridadComunicacion", "Claridad al comunicar")}
           {renderNumericRating("dominioContenido", "Dominio del contenido")}
@@ -178,6 +149,7 @@ export default function ModalCalificacion({
               onChange={handleChange}
               maxLength={500}
               placeholder="Comparte tu experiencia..."
+              disabled={loading}
             />
           </Form.Group>
 
@@ -192,6 +164,7 @@ export default function ModalCalificacion({
                 type="radio"
                 checked={formData.volveriaTomar === true}
                 onChange={() => setFormData({ ...formData, volveriaTomar: true })}
+                disabled={loading}
               />
               <Form.Check
                 inline
@@ -199,6 +172,7 @@ export default function ModalCalificacion({
                 type="radio"
                 checked={formData.volveriaTomar === false}
                 onChange={() => setFormData({ ...formData, volveriaTomar: false })}
+                disabled={loading}
               />
             </div>
           </Form.Group>
@@ -209,6 +183,7 @@ export default function ModalCalificacion({
               name="dificultad"
               value={formData.dificultad}
               onChange={handleChange}
+              disabled={loading}
             >
               <option value="baja">Baja</option>
               <option value="media">Media</option>
@@ -220,12 +195,7 @@ export default function ModalCalificacion({
 
       <Modal.Footer className="modal-footer-fixed">
         {calificacionExistente && (
-          <Button
-            variant="outline-danger"
-            type="button"
-            onClick={handleDelete}
-            disabled={loading}
-          >
+          <Button variant="outline-danger" onClick={handleDelete} disabled={loading}>
             Eliminar
           </Button>
         )}
@@ -236,11 +206,16 @@ export default function ModalCalificacion({
           onClick={handleSubmit}
           disabled={loading}
         >
-          {loading
-            ? "Guardando..."
-            : calificacionExistente
-            ? "Actualizar"
-            : "Enviar Calificación"}
+          {loading ? (
+            <>
+              <Spinner animation="border" size="sm" className="me-2" />
+              Guardando...
+            </>
+          ) : calificacionExistente ? (
+            "Actualizar"
+          ) : (
+            "Enviar Calificación"
+          )}
         </Button>
       </Modal.Footer>
     </Modal>

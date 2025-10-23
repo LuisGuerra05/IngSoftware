@@ -159,7 +159,6 @@ export default function MisAsignaturas() {
       <div className="d-flex justify-content-between align-items-center mb-4">
         <div style={{ flex: 1 }}>
           <h2 className="fw-bold mb-0">Mis Asignaturas</h2>
-          <div className="linea-azul"></div>
         </div>
 
         {/* 🔹 Barra de búsqueda solo visible en modo selección */}

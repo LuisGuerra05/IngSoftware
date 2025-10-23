@@ -38,3 +38,9 @@ export async function getCalificacionesByProfesor(id) {
   const { data } = await axios.get(`/calificaciones/${id}`);
   return data;
 }
+
+// --- Búsqueda (profesores + cursos) ---
+export async function search(q) {
+  const { data } = await axios.get(`/search`, { params: { q } });
+  return data; // { profesores: [], cursos: [] }
+}

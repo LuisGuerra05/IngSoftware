@@ -93,6 +93,18 @@
   box-shadow: 0 4px 16px rgba(0, 95, 163, 0.3) !important;
 }
 
+/* Resultados de búsqueda en tiempo real */
+.search-results {
+  max-width: 800px;
+  margin: 0 auto;
+}
+.search-results .list-group-item {
+  cursor: pointer;
+}
+.search-results .list-group-item:hover {
+  background: rgba(0,95,163,0.05);
+}
+
 /* RESPONSIVE */
 @media (max-width: 576px) {
   .home-input {

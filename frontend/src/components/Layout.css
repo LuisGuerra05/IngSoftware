@@ -24,7 +24,7 @@ html, body, #root {
 /* Contenido central */
 .page-content {
   flex: 1;
-  max-width: 1300px;
+  max-width: 1400px;
   margin: 0 auto;
   padding: 0px 20px 80px 20px; /* deja espacio para navbar fija */
   box-sizing: border-box;

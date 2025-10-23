@@ -148,13 +148,13 @@ export default function DetalleProfe() {
                 <Mortarboard size={18} className="text-primary me-2" />
                 <span>
                   <strong>Perfil UAI:</strong>{" "}
-                  <a
-                    href={profesor.linkUAI}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    Ver en sitio oficial <BoxArrowUpRight size={13} />
-                  </a>
+                  {profesor.linkUAI ? (
+                    <a href={profesor.linkUAI} target="_blank" rel="noopener noreferrer">
+                      Ver en sitio oficial <BoxArrowUpRight size={13} />
+                    </a>
+                  ) : (
+                    <span className="text-muted">No disponible</span>
+                  )}
                 </span>
               </div>
 

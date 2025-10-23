@@ -146,15 +146,22 @@ export default function Profesores() {
                         <Card.Text>
                           <strong>Cursos:</strong> {renderCursos(prof.cursos)}
                         </Card.Text>
-                        <a
-                          href={prof.linkUAI}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="btn btn-outline-dark btn-sm"
-                          onClick={(e) => e.stopPropagation()}
-                        >
-                          Ver perfil UAI
-                        </a>
+                        {prof.linkUAI ? (
+                          <a
+                            href={prof.linkUAI}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="btn btn-outline-dark btn-sm"
+                            onClick={(e) => e.stopPropagation()}
+                          >
+                            Ver perfil UAI
+                          </a>
+                        ) : (
+                          <button className="btn btn-secondary btn-sm" disabled>
+                            Sin perfil UAI
+                          </button>
+                        )}
+
                       </Card.Body>
                     </Card>
                   </Col>

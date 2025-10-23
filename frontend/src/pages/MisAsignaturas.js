@@ -422,30 +422,48 @@ export default function MisAsignaturas() {
       />
 
       {/* Modal de confirmación */}
+      {/* Modal de confirmación elegante (idéntico al de eliminar evaluación) */}
       <Modal
         show={showConfirmModal}
         onHide={() => setShowConfirmModal(false)}
         centered
+        className="modal-confirmacion"
       >
-        <Modal.Header closeButton>
-          <Modal.Title>Confirmar Limpieza</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          ¿Estás seguro de que deseas eliminar todas tus asignaturas
-          seleccionadas? Esta acción no se puede deshacer.
-        </Modal.Body>
-        <Modal.Footer>
-          <Button
-            variant="secondary"
-            onClick={() => setShowConfirmModal(false)}
+        <Modal.Body className="text-center p-4">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="50"
+            height="50"
+            fill="currentColor"
+            className="bi bi-exclamation-triangle-fill text-warning mb-3 animate-pulse"
+            viewBox="0 0 16 16"
           >
-            Cancelar
-          </Button>
-          <Button variant="danger" onClick={confirmarLimpiar}>
-            Sí, Limpiar
-          </Button>
-        </Modal.Footer>
+            <path d="M8.982 1.566a1.13 1.13 0 0 0-1.964 0L.165 13.233c-.457.778.091 1.767.982 1.767h13.706c.89 0 1.438-.99.982-1.767L8.982 1.566zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5zm.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2z" />
+          </svg>
+
+          <h5 className="fw-bold mb-2">¿Eliminar todas tus asignaturas?</h5>
+          <p className="text-muted mb-4">
+            Esta acción eliminará todos los ramos seleccionados y no se puede deshacer.
+          </p>
+
+          <div className="d-flex justify-content-center gap-3">
+            <Button
+              variant="secondary"
+              onClick={() => setShowConfirmModal(false)}
+            >
+              Cancelar
+            </Button>
+            <Button
+              variant="outline-danger"
+              className="btn-eliminar-confirm"
+              onClick={confirmarLimpiar}
+            >
+              Sí, limpiar todo
+            </Button>
+          </div>
+        </Modal.Body>
       </Modal>
+
     </Container>
   );
 }

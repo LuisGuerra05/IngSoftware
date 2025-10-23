@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { getCursos, getCursoById, getMisRamos, saveMisRamos } from "../api/api";
 import {
   Card,
@@ -14,6 +14,10 @@ import {
 } from "react-bootstrap";
 import ModalAsignatura from "../components/modalAsignatura";
 import "./MisAsignaturas.css";
+import { search } from "../api/api";
+import { Form, ListGroup } from "react-bootstrap";
+import { useNavigate } from 'react-router-dom';
+import "./Home.css";
 
 export default function MisAsignaturas() {
   const [cursos, setCursos] = useState([]);
@@ -22,6 +26,10 @@ export default function MisAsignaturas() {
   const [cursoSeleccionado, setCursoSeleccionado] = useState(null);
   const [misRamos, setMisRamos] = useState([]);
   const [modoSeleccion, setModoSeleccion] = useState(false);
+  const [query, setQuery] = useState('');
+  const [suggestions, setSuggestions] = useState([]);
+  const debounceRef = useRef(null);
+  const [courseFilterId, setCourseFilterId] = useState(null);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const MAX_RAMOS = 8;
 
@@ -40,6 +48,11 @@ export default function MisAsignaturas() {
   const totalPages = Math.ceil(
     (modoSeleccion ? cursos.length : misRamos.length) / itemsPerPage
   );
+
+  // Items a mostrar teniendo en cuenta el filtro por curso (si aplica)
+  const displayedItems = modoSeleccion
+    ? (courseFilterId ? cursos.filter(c => c._id === courseFilterId) : currentItems)
+    : (courseFilterId ? misRamos.filter(c => c._id === courseFilterId) : currentItems);
 
   const handlePageChange = (pageNumber) => setCurrentPage(pageNumber);
 
@@ -79,6 +92,28 @@ export default function MisAsignaturas() {
     cargarDatos();
   }, [token]);
 
+  // buscar sugerencias de cursos para MisAsignaturas
+  useEffect(() => {
+    if (!query.trim()) {
+      setSuggestions([]);
+      return;
+    }
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+    debounceRef.current = setTimeout(() => {
+      search(query).then(data => setSuggestions(data.cursos || [])).catch(err => console.error(err));
+    }, 300);
+    return () => clearTimeout(debounceRef.current);
+  }, [query]);
+
+  const applyCourseFilter = (id) => {
+    setCourseFilterId(id);
+    setQuery('');
+    setSuggestions([]);
+    setCurrentPage(1);
+  };
+
+  const clearCourseFilter = () => setCourseFilterId(null);
+
   const handleOpenModal = async (curso) => {
   try {
     const cursoCompleto = await getCursoById(curso._id);
@@ -95,6 +130,8 @@ export default function MisAsignaturas() {
     setShowModal(false);
     setCursoSeleccionado(null);
   };
+
+  const navigate = useNavigate();
 
   const handleSeleccionarRamo = (curso) => {
     if (misRamos.find((r) => r._id === curso._id)) {
@@ -147,10 +184,45 @@ export default function MisAsignaturas() {
     <Container style={{ marginTop: 100, marginBottom: 50 }}>
       {/* 🔹 Título con misma línea que Asignaturas */}
       <div className="d-flex justify-content-between align-items-center mb-4">
-        <div>
+        <div style={{ flex: 1 }}>
           <h2 className="fw-bold mb-0">Mis Asignaturas</h2>
           <div className="linea-azul"></div>
         </div>
+
+        <div style={{ maxWidth: 420, width: '100%', marginLeft: 16 }}>
+          {(!modoSeleccion && misRamos.length > 0) ? (
+            <div className="d-flex justify-content-end">
+              <Button className="btn-ver-todas" onClick={() => navigate('/asignaturas')}>
+                Ver todas las asignaturas
+              </Button>
+            </div>
+          ) : (
+            <>
+              <Form className="d-flex gap-2">
+                <Form.Control
+                  placeholder="Buscar asignaturas..."
+                  value={query}
+                  onChange={(e) => setQuery(e.target.value)}
+                />
+                {courseFilterId && (
+                  <Button variant="outline-secondary" onClick={clearCourseFilter}>
+                    Limpiar filtro
+                  </Button>
+                )}
+              </Form>
+              {query.trim() !== '' && suggestions.length > 0 && (
+                <ListGroup className={`mt-2 suggestion-list ${suggestions.length > 3 ? 'scrollable' : ''}`}>
+                  {suggestions.map(s => (
+                    <ListGroup.Item key={s._id} action onClick={() => applyCourseFilter(s._id)}>
+                      {s.nombre} <small className="text-muted">{s.codigo}</small>
+                    </ListGroup.Item>
+                  ))}
+                </ListGroup>
+              )}
+            </>
+          )}
+        </div>
+
         {!modoSeleccion && misRamos.length > 0 && (
           <Button className="btn-limpiar-ramos" onClick={handleLimpiarRamos}>
             Limpiar Ramos
@@ -185,7 +257,7 @@ export default function MisAsignaturas() {
                     No se encontraron asignaturas disponibles.
                   </p>
                 ) : (
-                  currentItems.map((curso) => {
+                  displayedItems.map((curso) => {
                     const seleccionado = estaSeleccionado(curso._id);
                     return (
                       <Col key={curso._id} md={6} lg={4} className="mb-4">
@@ -288,7 +360,7 @@ export default function MisAsignaturas() {
               ) : (
                 <>
                   <Row>
-                    {currentItems.map((curso) => (
+                    {displayedItems.map((curso) => (
                       <Col key={curso._id} md={6} lg={4} className="mb-4">
                         <Card
                           className="shadow-sm h-100 cursor-pointer"

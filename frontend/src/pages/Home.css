@@ -93,6 +93,44 @@
   box-shadow: 0 4px 16px rgba(0, 95, 163, 0.3) !important;
 }
 
+/* Estilo personalizado para el selector de filtro en Home */
+.home-filter-select {
+  border-radius: 12px;
+  padding: 10px 14px;
+  border: 1px solid #d1d5db;
+  background: linear-gradient(135deg, #ffffff, #f6fbff);
+  box-shadow: 0 6px 18px rgba(2, 46, 91, 0.04);
+  color: #0f172a;
+  font-weight: 500;
+  -webkit-appearance: none;
+  appearance: none;
+  background-image: linear-gradient(45deg, transparent 50%, #005fa3 50%), linear-gradient(135deg, #005fa3 50%, transparent 50%);
+  background-position: calc(100% - 18px) calc(1em + 2px), calc(100% - 13px) calc(1em + 2px);
+  background-size: 6px 6px, 6px 6px;
+  background-repeat: no-repeat;
+}
+
+.home-filter-select:focus {
+  outline: none;
+  border-color: #005fa3;
+  box-shadow: 0 0 0 4px rgba(0,95,163,0.12);
+}
+
+/* Botón "Ver todas las asignaturas" estilo blanco/negro y separación */
+.btn-ver-todas {
+  background: #fff !important;
+  color: #0f172a !important;
+  border: 1px solid #e5e7eb !important;
+  box-shadow: 0 6px 18px rgba(2, 46, 91, 0.04);
+  padding: 10px 18px !important;
+  border-radius: 10px !important;
+  margin-right: 12px; /* separa del botón Limpiar Ramos */
+}
+.btn-ver-todas:hover {
+  background: #f8fafc !important;
+  transform: translateY(-1px);
+}
+
 /* Resultados de búsqueda en tiempo real */
 .search-results {
   max-width: 800px;
@@ -105,6 +143,34 @@
   background: rgba(0,95,163,0.05);
 }
 
+/* Suggestions scrollable when many results */
+.suggestion-list {
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  background: #fff;
+  max-height: auto;
+  overflow: hidden;
+}
+.suggestion-list.scrollable {
+  max-height: 220px; /* muestra ~3-6 items dependiendo del viewport */
+  overflow-y: auto;
+}
+
+/* Scrollbar styling (WebKit) */
+.suggestion-list.scrollable::-webkit-scrollbar {
+  width: 10px;
+}
+.suggestion-list.scrollable::-webkit-scrollbar-track {
+  background: transparent;
+}
+.suggestion-list.scrollable::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg, #cbd5e1, #94a3b8);
+  border-radius: 10px;
+}
+.suggestion-list .list-group-item {
+  padding: 10px 14px;
+}
+
 /* RESPONSIVE */
 @media (max-width: 576px) {
   .home-input {
@@ -113,6 +179,28 @@
 
   .home-btn {
     width: 100%;
+  }
+}
+
+/* Mobile spacing: separar título y barra de búsqueda en pantallas pequeñas */
+@media (max-width: 576px) {
+  .home-title {
+    margin-bottom: 1.6rem !important;
+  }
+
+  .home-form {
+    margin-top: 0.6rem !important;
+    margin-bottom: 1rem !important;
+  }
+
+  /* títulos h2 usados en Asignaturas/Profesores */
+  h2.mb-4.fw-bold, h2.mb-0.fw-bold {
+    margin-bottom: 1.2rem !important;
+  }
+
+  /* ajustar lista de resultados para que no quede pegada */
+  .search-results {
+    margin-top: 0.8rem;
   }
 }
 

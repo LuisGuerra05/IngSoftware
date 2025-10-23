@@ -44,6 +44,17 @@ h2.mb-4.fw-bold {
   word-wrap: break-word;
 }
 
+@media (max-width: 576px) {
+  h2.mb-4.fw-bold {
+    margin-bottom: 1.2rem !important;
+  }
+
+  .profesores-page .container > .d-flex {
+    margin-top: 0.6rem;
+    margin-bottom: 0.6rem;
+  }
+}
+
 h2.mb-4.fw-bold::after {
   content: '';
   display: block;

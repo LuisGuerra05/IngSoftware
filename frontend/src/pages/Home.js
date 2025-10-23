@@ -6,6 +6,7 @@ import { useNavigate } from "react-router-dom";
 
 function Home() {
   const [query, setQuery] = useState("");
+  const [filterType, setFilterType] = useState("all"); // all | profesores | cursos
   const [loading, setLoading] = useState(false);
   const [results, setResults] = useState({ profesores: [], cursos: [] });
   const debounceRef = useRef(null);
@@ -71,9 +72,20 @@ function Home() {
               placeholder="Buscar por profesor o asignatura..."
               className="home-input"
             />
-              <Button type="submit" className="home-btn">
-                Buscar
-              </Button>
+            <Form.Select
+              className="home-filter-select"
+              value={filterType}
+              onChange={(e) => setFilterType(e.target.value)}
+              aria-label="Filtrar resultados"
+              style={{ maxWidth: 200 }}
+            >
+              <option value="all">Todos</option>
+              <option value="profesores">Profesores</option>
+              <option value="cursos">Asignaturas</option>
+            </Form.Select>
+            <Button type="submit" className="home-btn">
+              Buscar
+            </Button>
           </Form>
             {/* Resultados en tiempo real */}
             <div className="search-results mt-2">
@@ -85,17 +97,17 @@ function Home() {
                 <div className="p-2 text-muted">No se encontraron resultados</div>
               )}
 
-              {!loading && (results.profesores.length > 0 || results.cursos.length > 0) && (
+              {!loading && (
                 <ListGroup>
-                  {results.profesores.map((p) => (
+                  {filterType !== 'cursos' && results.profesores.map((p) => (
                     <ListGroup.Item key={`p-${p._id}`} action onClick={() => handleSelectProfesor(p._id)}>
-                      Profesor: {p.nombre} <small className="text-muted">{p.campus}</small>
+                      {filterType === 'all' ? `Profesor: ${p.nombre}` : p.nombre} <small className="text-muted">{p.campus}</small>
                     </ListGroup.Item>
                   ))}
 
-                  {results.cursos.map((c) => (
+                  {filterType !== 'profesores' && results.cursos.map((c) => (
                     <ListGroup.Item key={`c-${c._id}`} action onClick={() => handleSelectCurso(c._id)}>
-                      Asignatura: {c.nombre} <small className="text-muted">{c.codigo}</small>
+                      {filterType === 'all' ? `Asignatura: ${c.nombre}` : c.nombre} <small className="text-muted">{c.codigo}</small>
                     </ListGroup.Item>
                   ))}
                 </ListGroup>

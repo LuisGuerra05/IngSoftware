@@ -107,6 +107,7 @@ router.get("/:profesorId", async (req, res) => {
       comentarios: calificaciones
         .filter((c) => c.comentario)
         .map((c) => ({
+          _id: c._id,
           comentario: c.comentario,
           fecha: c.createdAt,
         })),

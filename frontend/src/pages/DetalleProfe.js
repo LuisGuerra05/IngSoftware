@@ -5,6 +5,7 @@ import {
   getCursoById,
   getCalificacionesByProfesor,
   getMiCalificacionByProfesor,
+  crearReporte,
 } from "../api/api";
 import {
   Container,
@@ -15,6 +16,7 @@ import {
   Button,
   Toast,
   ToastContainer,
+  Dropdown,
 } from "react-bootstrap";
 import {
   Mortarboard,
@@ -22,6 +24,7 @@ import {
   CheckCircle,
   Trash3,
   Flag,
+  ThreeDotsVertical,
 } from "react-bootstrap-icons";
 import EstadisticasProfe from "../components/EstadisticasProfe";
 import ModalAsignatura from "../components/modalAsignatura";
@@ -43,8 +46,10 @@ export default function DetalleProfe() {
   const [toastColor, setToastColor] = useState("success");
 
   const token = localStorage.getItem("token");
-  const role = localStorage.getItem("role"); // 🔹 nuevo
+  const role = localStorage.getItem("role");
+  const userId = localStorage.getItem("userId");
 
+  // === Cargar datos ===
   const cargarDatos = async () => {
     try {
       const [profData, califData, miCalif] = await Promise.all([
@@ -56,6 +61,7 @@ export default function DetalleProfe() {
       setComentarios(califData?.comentarios || []);
       setMiCalificacion(miCalif);
     } catch (err) {
+      console.error(err);
       setError("No se pudo cargar la información del profesor.");
     } finally {
       setLoading(false);
@@ -101,6 +107,32 @@ export default function DetalleProfe() {
     }
   };
 
+  // === Manejar reporte de comentario ===
+  const handleReportar = async (comentario) => {
+    try {
+      const comentarioId = comentario._id || comentario.id;
+
+      if (!comentarioId) {
+        console.error("❌ No se encontró ID del comentario:", comentario);
+        setToastMensaje("No se pudo identificar el comentario.");
+        setToastColor("danger");
+        setShowToast(true);
+        return;
+      }
+
+      await crearReporte(token, comentarioId, profesor._id, "Comentario inapropiado");
+      setToastMensaje("Comentario reportado correctamente");
+      setToastColor("warning");
+      setShowToast(true);
+    } catch (err) {
+      console.error("Error al enviar reporte:", err);
+      setToastMensaje("Error al enviar reporte");
+      setToastColor("danger");
+      setShowToast(true);
+    }
+  };
+
+  // === Render ===
   if (loading)
     return (
       <Container className="text-center mt-5">
@@ -128,6 +160,7 @@ export default function DetalleProfe() {
       <Container>
         <Card className="detalle-profe-card shadow-sm">
           <Row className="g-4 align-items-start">
+            {/* Columna izquierda */}
             <Col xs={12} md={5} className="detalle-profe-info">
               <h2 className="detalle-profe-nombre">{profesor.nombre}</h2>
               <span className="detalle-profe-campus">{profesor.campus}</span>
@@ -137,7 +170,11 @@ export default function DetalleProfe() {
                 <span>
                   <strong>Perfil UAI:</strong>{" "}
                   {profesor.linkUAI ? (
-                    <a href={profesor.linkUAI} target="_blank" rel="noopener noreferrer">
+                    <a
+                      href={profesor.linkUAI}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
                       Ver en sitio oficial <BoxArrowUpRight size={13} />
                     </a>
                   ) : (
@@ -176,40 +213,97 @@ export default function DetalleProfe() {
               ) : (
                 <p className="text-muted">No hay cursos registrados.</p>
               )}
+              
+              <h5 className="detalle-profe-subtitulo mt-4">Comentarios</h5>
 
               {/* === COMENTARIOS === */}
-              <div className="comentarios-container mt-4">
-                <h5 className="detalle-profe-subtitulo">Comentarios</h5>
+              <div className="comentarios-container mt-3">
 
-                {comentarios.length > 0 ? (
-                  comentarios.map((c, i) => (
-                    <div key={i} className="comentario-item">
-                      <p className="mb-1">“{c.comentario}”</p>
-                      <div className="d-flex justify-content-between align-items-center">
-                        <small className="text-muted">
-                          {new Date(c.fecha).toLocaleDateString("es-CL")}
-                        </small>
-                        {/* 🔹 Botón de reportar visible para todos */}
-                        <Button
-                          variant="outline-danger"
-                          size="sm"
-                          className="ms-2"
-                          onClick={() => alert("Reporte enviado")}
-                        >
-                          <Flag size={14} className="me-1" />
-                          Reportar
-                        </Button>
-                      </div>
+                {/* Comentario propio destacado */}
+                {miCalificacion?.comentario && (
+                  <div className="comentario-item propio mb-3 p-2 border rounded bg-primary bg-opacity-10 border-primary">
+                    <div className="d-flex justify-content-between align-items-center">
+                      <span className="badge bg-primary">Tu comentario</span>
+                      <small className="text-muted">
+                        {new Date(
+                          miCalificacion.updatedAt || miCalificacion.createdAt
+                        ).toLocaleDateString("es-CL")}
+                      </small>
                     </div>
-                  ))
+                    <p className="mt-2 mb-1 fw-semibold">
+                      “{miCalificacion.comentario}”
+                    </p>
+                  </div>
+                )}
+
+                {/* Resto de comentarios */}
+                {comentarios.length > 0 ? (
+                  comentarios
+                    .filter(
+                      (c) =>
+                        !miCalificacion ||
+                        c.comentario !== miCalificacion.comentario
+                    )
+                    .map((c, i) => {
+                      const esPropio =
+                        c.usuarioId === userId || c.usuario?._id === userId;
+
+                      return (
+                        <div
+                          key={i}
+                          className={`comentario-item p-2 border rounded mb-2 ${
+                            esPropio
+                              ? "bg-primary bg-opacity-10 border-primary"
+                              : "bg-light"
+                          }`}
+                        >
+                          <div className="d-flex justify-content-between align-items-start">
+                            <div className="flex-grow-1">
+                              <p className="mb-1 fw-semibold">“{c.comentario}”</p>
+                            </div>
+
+                            {/* Solo muestra menú si NO es tu comentario */}
+                            {!esPropio && (
+                              <Dropdown align="end">
+                                <Dropdown.Toggle
+                                  variant="light"
+                                  size="sm"
+                                  className="border-0"
+                                >
+                                  <ThreeDotsVertical />
+                                </Dropdown.Toggle>
+                                <Dropdown.Menu>
+                                  <Dropdown.Item
+                                    onClick={() => handleReportar(c)}
+                                  >
+                                    <Flag
+                                      size={14}
+                                      className="me-2 text-danger"
+                                    />
+                                    Reportar
+                                  </Dropdown.Item>
+                                </Dropdown.Menu>
+                              </Dropdown>
+                            )}
+                          </div>
+
+                          <small className="text-muted">
+                            {new Date(c.fecha).toLocaleDateString("es-CL")}
+                          </small>
+                        </div>
+                      );
+                    })
                 ) : (
                   <p className="text-muted">No hay comentarios disponibles.</p>
                 )}
               </div>
             </Col>
 
+            {/* Columna derecha */}
             <Col xs={12} md={7} className="detalle-profe-stats">
-              <h5 className="detalle-profe-subtitulo">Estadísticas y valoraciones</h5>
+              <h5 className="detalle-profe-subtitulo">
+                Estadísticas y valoraciones
+              </h5>
               <EstadisticasProfe profesorId={id} />
             </Col>
           </Row>
@@ -217,7 +311,11 @@ export default function DetalleProfe() {
       </Container>
 
       {/* Modales */}
-      <ModalAsignatura show={showModal} handleClose={handleCloseModal} asignatura={cursoSeleccionado} />
+      <ModalAsignatura
+        show={showModal}
+        handleClose={handleCloseModal}
+        asignatura={cursoSeleccionado}
+      />
 
       {role !== "admin" && (
         <ModalCalificacion
@@ -231,10 +329,24 @@ export default function DetalleProfe() {
       )}
 
       {/* Toast */}
-      <ToastContainer position="bottom-end" className="p-3" style={{ zIndex: 1060 }}>
-        <Toast show={showToast} onClose={() => setShowToast(false)} bg={toastColor} delay={4000} autohide>
+      <ToastContainer
+        position="bottom-end"
+        className="p-3"
+        style={{ zIndex: 1060 }}
+      >
+        <Toast
+          show={showToast}
+          onClose={() => setShowToast(false)}
+          bg={toastColor}
+          delay={4000}
+          autohide
+        >
           <Toast.Body className="d-flex align-items-center text-white fw-semibold">
-            {toastColor === "danger" ? <Trash3 className="me-2" size={18} /> : <CheckCircle className="me-2" size={18} />}
+            {toastColor === "danger" ? (
+              <Trash3 className="me-2" size={18} />
+            ) : (
+              <CheckCircle className="me-2" size={18} />
+            )}
             {toastMensaje}
           </Toast.Body>
         </Toast>

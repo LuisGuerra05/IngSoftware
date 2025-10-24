@@ -84,3 +84,29 @@ export async function saveMisRamos(token, ramosIds) {
   );
   return data.misRamos;
 }
+
+// --- Reportes ---
+export async function crearReporte(token, comentarioId, profesorId, motivo) {
+  const { data } = await axios.post(
+    "/reportes",
+    { comentarioId, profesorId, motivo },
+    { headers: { Authorization: `Bearer ${token}` } }
+  );
+  return data;
+}
+
+export async function getReportes(token) {
+  const { data } = await axios.get("/reportes", {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  return data;
+}
+
+export async function actualizarEstadoReporte(token, id, estado) {
+  const { data } = await axios.put(
+    `/reportes/${id}`,
+    { estado },
+    { headers: { Authorization: `Bearer ${token}` } }
+  );
+  return data;
+}

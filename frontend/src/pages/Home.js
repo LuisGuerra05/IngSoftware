@@ -17,13 +17,13 @@ import "bootstrap-icons/font/bootstrap-icons.css";
 
 function Home() {
   const [query, setQuery] = useState("");
-  const [filterType, setFilterType] = useState("all"); // all | profesores | cursos
+  const [filterType, setFilterType] = useState("all");
   const [loading, setLoading] = useState(false);
   const [results, setResults] = useState({ profesores: [], cursos: [] });
   const debounceRef = useRef(null);
   const navigate = useNavigate();
 
-  // 🔹 Ejecutar búsqueda con debounce
+  // 🔹 Búsqueda con debounce
   useEffect(() => {
     if (!query.trim()) {
       setResults({ profesores: [], cursos: [] });
@@ -57,6 +57,7 @@ function Home() {
       : filterType === "cursos"
       ? []
       : results.profesores;
+
   const filteredCursos =
     filterType === "cursos"
       ? results.cursos
@@ -66,7 +67,6 @@ function Home() {
 
   return (
     <Container className="home-page">
-      {/* --- Hero --- */}
       <Row className="justify-content-center text-center mb-4">
         <Col xs={12} md={8}>
           <h1 className="home-title fw-bold">Escoge mejor tu profesor</h1>
@@ -76,36 +76,40 @@ function Home() {
         </Col>
       </Row>
 
-      {/* --- Buscador principal --- */}
       <Row className="justify-content-center">
-        <Col xs={12} md={8}>
-          <Form
-            onSubmit={handleSearch}
-            className="d-flex flex-column flex-md-row justify-content-center align-items-center gap-2 home-form"
-          >
-            <Form.Control
-              type="text"
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              placeholder="Buscar por profesor o asignatura..."
-              className="home-input shadow-sm"
-            />
-            <Form.Select
-              className="home-filter-select shadow-sm"
-              value={filterType}
-              onChange={(e) => setFilterType(e.target.value)}
-              style={{ maxWidth: 200 }}
-            >
-              <option value="all">Todos</option>
-              <option value="profesores">Profesores</option>
-              <option value="cursos">Asignaturas</option>
-            </Form.Select>
-            <Button type="submit" className="home-btn">
-              <i className="bi bi-search"></i> Buscar
-            </Button>
+        <Col xs={12} md={10} lg={8}>
+          <Form onSubmit={handleSearch} className="home-form">
+            {/* Contenedor flex que alinea filtro + input + botón */}
+            <div className="home-search-wrapper">
+              {/* Filtro */}
+              <Form.Select
+                className="home-filter-select shadow-sm"
+                value={filterType}
+                onChange={(e) => setFilterType(e.target.value)}
+              >
+                <option value="all">Todos</option>
+                <option value="profesores">Profesores</option>
+                <option value="cursos">Asignaturas</option>
+              </Form.Select>
+
+              {/* Input */}
+              <Form.Control
+                type="text"
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                placeholder="Buscar por profesor o asignatura..."
+                className="home-input shadow-sm"
+              />
+
+              {/* Botón (oculto en móvil) */}
+              <Button type="submit" className="home-btn d-none d-md-block">
+                <i className="bi bi-search"></i> Buscar
+              </Button>
+            </div>
           </Form>
 
-          {/* --- Resultados --- */}
+
+          {/* Resultados */}
           <div className="search-results mt-3">
             {loading && (
               <div className="p-3 text-center text-muted">

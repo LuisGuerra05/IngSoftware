@@ -164,7 +164,10 @@ export default function MisAsignaturas() {
         {/* 🔹 Barra de búsqueda solo visible en modo selección */}
         {modoSeleccion && (
           <div style={{ maxWidth: 420, width: "100%", marginLeft: 16 }}>
-            <Form className="d-flex gap-2">
+            <Form
+              className="d-flex gap-2"
+              onSubmit={(e) => e.preventDefault()} // 🔹 Evita refresco con Enter
+            >
               <Form.Control
                 placeholder="Buscar asignaturas..."
                 value={query}

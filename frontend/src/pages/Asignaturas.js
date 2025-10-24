@@ -73,7 +73,10 @@ export default function Asignaturas() {
       <div className="d-flex align-items-center justify-content-between mb-3">
         <h2 className="mb-0 fw-bold">Asignaturas</h2>
         <div style={{ maxWidth: 420, width: "100%" }}>
-          <Form className="d-flex gap-2">
+          <Form
+            className="d-flex gap-2"
+            onSubmit={(e) => e.preventDefault()} // 🔹 Evita refresco con Enter
+          >
             <Form.Control
               placeholder="Buscar asignaturas..."
               value={query}

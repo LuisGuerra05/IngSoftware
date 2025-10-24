@@ -102,11 +102,12 @@ export async function getReportes(token) {
   return data;
 }
 
-export async function actualizarEstadoReporte(token, id, estado) {
+export async function actualizarEstadoReporte(token, id, accion) {
   const { data } = await axios.put(
     `/reportes/${id}`,
-    { estado },
+    { accion }, // ✅ cambiamos "estado" por "accion"
     { headers: { Authorization: `Bearer ${token}` } }
   );
   return data;
 }
+

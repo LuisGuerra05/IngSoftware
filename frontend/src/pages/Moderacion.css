@@ -1,13 +1,126 @@
-.moderacion-title {
-  color: #005fa3;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
+/* ===== CONTENEDOR GENERAL ===== */
+.moderacion-container {
+  margin-top: 100px;
+  margin-bottom: 60px;
+  animation: fadeInUp 0.4s ease;
 }
 
-.linea-azul {
-  width: 80px;
-  height: 3px;
-  background: #005fa3;
-  margin: 0 auto 20px;
-  border-radius: 2px;
+/* ===== TÍTULO Y SUBTÍTULO ===== */
+.moderacion-title {
+  font-size: clamp(1.8rem, 3vw, 2.2rem);
+  color: #111827;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+  margin-bottom: 0.5rem;
+}
+
+.moderacion-subtitle {
+  font-size: 1rem;
+  color: #6b7280;
+  margin-bottom: 1.5rem;
+}
+
+/* ===== CARD ===== */
+.moderacion-card {
+  border-radius: 18px;
+  background: #ffffff;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+  overflow: hidden;
+  animation: fadeInUp 0.35s ease;
+  padding: 1.5rem !important;
+}
+
+/* ===== TABLA ===== */
+.moderacion-table {
+  border-collapse: separate;
+  border-spacing: 0 10px;
+  width: 100%;
+}
+
+.moderacion-table th {
+  background: #f9fafb;
+  color: #374151;
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 0.9rem;
+  padding: 12px;
+  border-bottom: 2px solid #e5e7eb;
+}
+
+.moderacion-table td {
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 12px;
+  vertical-align: middle;
+  word-wrap: break-word;
+}
+
+/* ===== ESTADOS ===== */
+.estado-badge {
+  font-size: 0.85rem !important;
+  padding: 6px 10px !important;
+  border-radius: 8px !important;
+}
+
+/* ===== BOTONES ===== */
+.btn-accion {
+  min-width: 100px;
+  border-radius: 8px !important;
+  font-weight: 500 !important;
+  transition: all 0.2s ease;
+}
+
+.btn-accion:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 95, 163, 0.2);
+}
+
+/* ===== ANIMACIÓN ===== */
+@keyframes fadeInUp {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 992px) {
+  .moderacion-table th,
+  .moderacion-table td {
+    font-size: 0.85rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .moderacion-table {
+    font-size: 0.8rem;
+  }
+  .moderacion-card {
+    padding: 1rem !important;
+  }
+}
+
+@media (max-width: 576px) {
+  .moderacion-container {
+    margin-top: 80px;
+  }
+
+  .moderacion-title {
+    font-size: 1.5rem;
+  }
+
+  .moderacion-subtitle {
+    font-size: 0.9rem;
+  }
+
+  .moderacion-table th,
+  .moderacion-table td {
+    font-size: 0.8rem;
+    padding: 8px;
+  }
 }

@@ -17,7 +17,7 @@ router.post("/", requireAuth, async (req, res) => {
     const existe = await Reporte.findOne({ comentarioId, usuarioId });
     if (existe) {
       return res
-        .status(409) // 409 = conflicto (más semántico que 400)
+        .status(409) // 409 = conflicto
         .json({ ok: false, message: "Ya reportaste este comentario." });
     }
 
@@ -31,10 +31,14 @@ router.post("/", requireAuth, async (req, res) => {
 
     await nuevoReporte.save();
 
-    res.status(201).json({ ok: true, message: "Reporte enviado correctamente." });
+    res
+      .status(201)
+      .json({ ok: true, message: "Reporte enviado correctamente." });
   } catch (error) {
     console.error("❌ Error al crear reporte:", error);
-    res.status(500).json({ ok: false, error: "Error interno al crear el reporte." });
+    res
+      .status(500)
+      .json({ ok: false, error: "Error interno al crear el reporte." });
   }
 });
 
@@ -45,12 +49,12 @@ router.get("/", requireAuth, async (req, res) => {
       .populate({
         path: "comentarioId",
         model: "Calificacion",
+        select: "comentario createdAt estudianteId",
         populate: {
           path: "estudianteId",
           model: "User",
-          select: "email",
+          select: "email", // ✅ aquí se carga el email del usuario que comentó
         },
-        select: "comentario createdAt estudianteId",
       })
       .populate({
         path: "profesorId",
@@ -60,8 +64,9 @@ router.get("/", requireAuth, async (req, res) => {
       .populate({
         path: "usuarioId",
         model: "User",
-        select: "email",
-      });
+        select: "email", // ✅ usuario que reportó
+      })
+      .sort({ fecha: -1 }); // opcional: orden por fecha descendente
 
     res.json(reportes);
   } catch (error) {

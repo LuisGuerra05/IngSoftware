@@ -55,10 +55,29 @@ export default function EstadisticasProfe({ profesorId }) {
     return stars;
   };
 
+  // ✅ Calcular cantidad total de evaluaciones reales (no solo comentarios)
+  const totalEvaluaciones =
+    stats.totalCalificaciones || // si algún día el backend lo renombra
+    stats.totalResenas || // el nombre actual en tu backend
+    stats.total || // fallback genérico
+    0;
+
   return (
     <Card className="estadisticas-card">
       <Card.Body>
-        <h5 className="estadisticas-titulo">Valoraciones promedio</h5>
+        <div className="d-flex justify-content-between align-items-center mb-3">
+          <h5 className="estadisticas-titulo mb-0">Valoraciones promedio</h5>
+
+          {/* 🔹 Total de evaluaciones (reales) */}
+          {totalEvaluaciones > 0 && (
+            <div className="total-evaluaciones">
+              <span className="fw-semibold">
+                {totalEvaluaciones}{" "}
+                {totalEvaluaciones === 1 ? "evaluación" : "evaluaciones"}
+              </span>
+            </div>
+          )}
+        </div>
 
         {/* ⭐ Categorías principales */}
         <div className="categorias-container">
@@ -79,6 +98,7 @@ export default function EstadisticasProfe({ profesorId }) {
         {/* ✅ Indicadores adicionales */}
         {stats.indicadores && (
           <div className="indicadores-container">
+            {/* Volvería a tomar */}
             <div className="mb-3">
               <p className="mb-1 fw-semibold">¿Lo volverías a tomar?</p>
               <p className="text-primary mb-1">
@@ -90,6 +110,7 @@ export default function EstadisticasProfe({ profesorId }) {
               />
             </div>
 
+            {/* Nivel de dificultad */}
             <div>
               <p className="mb-2 fw-semibold">Nivel de dificultad percibida</p>
               {Object.entries(stats.indicadores.dificultad).map(
@@ -98,10 +119,7 @@ export default function EstadisticasProfe({ profesorId }) {
                     <small className="text-capitalize">
                       {nivel}: {porcentaje}%
                     </small>
-                    <ProgressBar
-                      now={porcentaje}
-                      className="progress-bar-blue"
-                    />
+                    <ProgressBar now={porcentaje} className="progress-bar-blue" />
                   </div>
                 )
               )}

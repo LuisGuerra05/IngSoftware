@@ -44,6 +44,7 @@ export default function DetalleProfe() {
   const [showToast, setShowToast] = useState(false);
   const [toastMensaje, setToastMensaje] = useState("");
   const [toastColor, setToastColor] = useState("success");
+  const [actualizarStats, setActualizarStats] = useState(false); // 🔹 Nuevo estado
 
   const token = localStorage.getItem("token");
   const role = localStorage.getItem("role");
@@ -95,40 +96,58 @@ export default function DetalleProfe() {
       if (tipo === "crear") mensaje = "Evaluación enviada con éxito";
       else if (tipo === "editar") {
         mensaje = "Evaluación actualizada correctamente";
-        color = "primary";
+        color = "success";
       } else if (tipo === "eliminar") {
         mensaje = "Evaluación eliminada correctamente";
         color = "danger";
       }
-      setToastMensaje(mensaje);
-      setToastColor(color);
-      setShowToast(true);
-      setTimeout(() => setShowToast(false), 4000);
+
+      mostrarToast(mensaje, color);
+
+      // 🔹 Forzar actualización de estadísticas
+      setActualizarStats((prev) => !prev);
     }
+  };
+
+  // === Función centralizada para toasts ===
+  const mostrarToast = (mensaje, color = "success") => {
+    setToastMensaje(mensaje);
+    setToastColor(color);
+    setShowToast(true);
+    setTimeout(() => setShowToast(false), 4000);
   };
 
   // === Manejar reporte de comentario ===
   const handleReportar = async (comentario) => {
     try {
       const comentarioId = comentario._id || comentario.id;
-
       if (!comentarioId) {
-        console.error("❌ No se encontró ID del comentario:", comentario);
-        setToastMensaje("No se pudo identificar el comentario.");
-        setToastColor("danger");
-        setShowToast(true);
+        mostrarToast("No se pudo identificar el comentario.", "danger");
+        return;
+      }
+
+      const yaReportado =
+        comentario.reportes?.some((r) => r.usuarioId === userId) || false;
+
+      if (yaReportado) {
+        mostrarToast("Ya has reportado este comentario anteriormente.", "info");
         return;
       }
 
       await crearReporte(token, comentarioId, profesor._id, "Comentario inapropiado");
-      setToastMensaje("Comentario reportado correctamente");
-      setToastColor("warning");
-      setShowToast(true);
+      mostrarToast("Comentario reportado correctamente", "success");
     } catch (err) {
       console.error("Error al enviar reporte:", err);
-      setToastMensaje("Error al enviar reporte");
-      setToastColor("danger");
-      setShowToast(true);
+      if (err.response && err.response.data && err.response.data.message) {
+        const msg = err.response.data.message;
+        if (msg.includes("Ya reportaste")) {
+          mostrarToast("Ya has reportado este comentario anteriormente.", "info");
+        } else {
+          mostrarToast(msg, "danger");
+        }
+      } else {
+        mostrarToast("Error al enviar reporte", "danger");
+      }
     }
   };
 
@@ -183,7 +202,6 @@ export default function DetalleProfe() {
                 </span>
               </div>
 
-              {/* 🔹 Solo estudiantes pueden evaluar */}
               {role !== "admin" && (
                 <div className="d-flex gap-3 mt-3">
                   <Button
@@ -213,13 +231,10 @@ export default function DetalleProfe() {
               ) : (
                 <p className="text-muted">No hay cursos registrados.</p>
               )}
-              
+
               <h5 className="detalle-profe-subtitulo mt-4">Comentarios</h5>
 
-              {/* === COMENTARIOS === */}
               <div className="comentarios-container mt-3">
-
-                {/* Comentario propio destacado */}
                 {miCalificacion?.comentario && (
                   <div className="comentario-item propio mb-3 p-2 border rounded bg-primary bg-opacity-10 border-primary">
                     <div className="d-flex justify-content-between align-items-center">
@@ -236,7 +251,6 @@ export default function DetalleProfe() {
                   </div>
                 )}
 
-                {/* Resto de comentarios */}
                 {comentarios.length > 0 ? (
                   comentarios
                     .filter(
@@ -261,8 +275,6 @@ export default function DetalleProfe() {
                             <div className="flex-grow-1">
                               <p className="mb-1 fw-semibold">“{c.comentario}”</p>
                             </div>
-
-                            {/* Solo muestra menú si NO es tu comentario */}
                             {!esPropio && (
                               <Dropdown align="end">
                                 <Dropdown.Toggle
@@ -286,7 +298,6 @@ export default function DetalleProfe() {
                               </Dropdown>
                             )}
                           </div>
-
                           <small className="text-muted">
                             {new Date(c.fecha).toLocaleDateString("es-CL")}
                           </small>
@@ -304,7 +315,8 @@ export default function DetalleProfe() {
               <h5 className="detalle-profe-subtitulo">
                 Estadísticas y valoraciones
               </h5>
-              <EstadisticasProfe profesorId={id} />
+              {/* 🔹 Se vuelve a renderizar cuando actualizarStats cambia */}
+              <EstadisticasProfe profesorId={id} key={actualizarStats} />
             </Col>
           </Row>
         </Card>
@@ -328,28 +340,27 @@ export default function DetalleProfe() {
         />
       )}
 
-      {/* Toast */}
-      <ToastContainer
-        position="bottom-end"
-        className="p-3"
-        style={{ zIndex: 1060 }}
-      >
-        <Toast
-          show={showToast}
-          onClose={() => setShowToast(false)}
-          bg={toastColor}
-          delay={4000}
-          autohide
-        >
-          <Toast.Body className="d-flex align-items-center text-white fw-semibold">
-            {toastColor === "danger" ? (
-              <Trash3 className="me-2" size={18} />
-            ) : (
-              <CheckCircle className="me-2" size={18} />
-            )}
-            {toastMensaje}
-          </Toast.Body>
-        </Toast>
+      {/* ✅ Toast fijo elegante */}
+      <ToastContainer className="toast-container-fijo">
+        {showToast && (
+          <Toast
+            show={showToast}
+            onClose={() => setShowToast(false)}
+            delay={4000}
+            autohide
+            className="custom-toast-elegante"
+            data-type={toastColor}
+          >
+            <Toast.Body className="d-flex align-items-center fw-semibold">
+              {toastColor === "danger" ? (
+                <Trash3 className="me-2" size={18} />
+              ) : (
+                <CheckCircle className="me-2" size={18} />
+              )}
+              {toastMensaje}
+            </Toast.Body>
+          </Toast>
+        )}
       </ToastContainer>
     </div>
   );

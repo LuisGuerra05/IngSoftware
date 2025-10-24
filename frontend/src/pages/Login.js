@@ -1,20 +1,20 @@
-import React, { useState } from 'react'; 
-import { useNavigate } from 'react-router-dom';
-import Form from 'react-bootstrap/Form';
-import Button from 'react-bootstrap/Button';
-import Alert from 'react-bootstrap/Alert';
-import 'bootstrap/dist/css/bootstrap.min.css';
-import './Login.css';
+import React, { useState } from "react";
+import Form from "react-bootstrap/Form";
+import Button from "react-bootstrap/Button";
+import Alert from "react-bootstrap/Alert";
+import "bootstrap/dist/css/bootstrap.min.css";
+import "./Login.css";
+import { useAuth } from "../context/AuthContext";
 
 const UAI_REGEX = /^[a-z0-9._%+-]+@alumnos\.uai\.cl$/i;
 
-function Login() {
-  const navigate = useNavigate();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+export default function Login() {
+  const { login } = useAuth();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [touched, setTouched] = useState({ email: false, password: false });
   const [loading, setLoading] = useState(false);
-  const [errorMsg, setErrorMsg] = useState('');
+  const [errorMsg, setErrorMsg] = useState("");
 
   const emailValid = UAI_REGEX.test(email);
   const pwdValid = password.length >= 6;
@@ -23,45 +23,36 @@ function Login() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setTouched({ email: true, password: true });
-    setErrorMsg('');
+    setErrorMsg("");
+
     if (!formValid) return;
 
     try {
       setLoading(true);
       const API_URL =
-        process.env.NODE_ENV === 'development'
-          ? 'http://localhost:4000/api/login'
-          : '/api/login';
+        process.env.NODE_ENV === "development"
+          ? "http://localhost:4000/api/login"
+          : "/api/login";
 
       const res = await fetch(API_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: email.trim(), password: password.trim() }),
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: email.trim(),
+          password: password.trim(),
+        }),
       });
 
       const data = await res.json().catch(() => ({}));
 
       if (!res.ok || !data?.token) {
-        throw new Error(data?.error || 'Correo o contraseña incorrecta');
+        throw new Error(data?.error || "Correo o contraseña incorrecta");
       }
 
-      // 🔹 Guardar token
-      localStorage.setItem('token', data.token);
-
-      // 🔹 Guardar email del usuario
-      if (data.user?.email) {
-        localStorage.setItem('usuario', data.user.email);
-      }
-
-      // 🔹 Guardar rol del usuario
-      if (data.user?.role) {
-        localStorage.setItem('role', data.user.role);
-      }
-
-      // Redirigir al home
-      navigate('/');
+      // 🔹 Usar la función login del contexto (centraliza el flujo)
+      login(data.token, data.user?.email, data.user?.role);
     } catch (err) {
-      setErrorMsg(err.message || 'No se pudo iniciar sesión');
+      setErrorMsg(err.message || "No se pudo iniciar sesión");
     } finally {
       setLoading(false);
     }
@@ -74,9 +65,8 @@ function Login() {
           <img
             src="/img/Logo.png"
             alt="Logo Plataforma"
-            style={{ width: '200px', marginBottom: '1px' }}
+            style={{ width: "200px", marginBottom: "1px" }}
           />
-
           <div className="logo-caption tight">Calificador de Profesores</div>
           <h2>PLATAFORMA ACADÉMICA</h2>
           <p>Ingrese con su correo UAI</p>
@@ -127,12 +117,10 @@ function Login() {
             className="login-btn"
             disabled={!formValid || loading}
           >
-            {loading ? 'Ingresando…' : 'Ingresar'}
+            {loading ? "Ingresando…" : "Ingresar"}
           </Button>
         </Form>
       </div>
     </div>
   );
 }
-
-export default Login;

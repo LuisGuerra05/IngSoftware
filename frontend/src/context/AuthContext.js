@@ -5,33 +5,28 @@ const AuthContext = createContext();
 
 export function AuthProvider({ children }) {
   const navigate = useNavigate();
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-
-  useEffect(() => {
-    // 🔹 Verifica token al cargar
-    const token = localStorage.getItem("token");
-    if (token) {
-      setIsAuthenticated(true);
-    } else {
-      setIsAuthenticated(false);
-    }
-  }, []);
-
-  const login = (token, userEmail, role) => {
-    localStorage.setItem("token", token);
-    localStorage.setItem("usuario", userEmail);
-    if (role) localStorage.setItem("role", role);
-    setIsAuthenticated(true);
-    navigate("/", { replace: true });
-  };
+  const [isAuthenticated, setIsAuthenticated] = useState(
+    !!localStorage.getItem("token")
+  );
 
   const logout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("usuario");
-    localStorage.removeItem("role");
     setIsAuthenticated(false);
-    navigate("/login", { replace: true });
+    navigate("/login", { replace: true }); // 🔹 redirige sin recargar
   };
+
+  const login = (token, userEmail) => {
+    localStorage.setItem("token", token);
+    localStorage.setItem("usuario", userEmail);
+    setIsAuthenticated(true);
+    navigate("/", { replace: true });
+  };
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    setIsAuthenticated(!!token);
+  }, []);
 
   return (
     <AuthContext.Provider value={{ isAuthenticated, login, logout }}>

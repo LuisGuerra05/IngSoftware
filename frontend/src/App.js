@@ -23,6 +23,7 @@ export default function App() {
   return (
     <Routes>
       <Route path="/login" element={<Login />} />
+
       <Route
         path="/"
         element={
@@ -53,10 +54,11 @@ export default function App() {
           </ProtectedRoute>
         }
       />
+      {/* 🔹 Solo estudiantes pueden acceder */}
       <Route
         path="/mis-asignaturas"
         element={
-          <ProtectedRoute>
+          <ProtectedRoute requiredRole="estudiante">
             <Layout>
               <MisAsignaturas />
             </Layout>

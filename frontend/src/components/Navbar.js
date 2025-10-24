@@ -12,9 +12,11 @@ function AppNavbar() {
   const lastScroll = useRef(window.scrollY);
   const location = useLocation();
   const navigate = useNavigate();
-  const usuarioEmail = localStorage.getItem("usuario") || "usuario@alumnos.uai.cl";
-  const role = localStorage.getItem("role"); // 🔹 Obtener rol del usuario
 
+  const usuarioEmail = localStorage.getItem("usuario") || "usuario@alumnos.uai.cl";
+  const role = localStorage.getItem("role"); // 🔹 Rol del usuario
+
+  // 🔹 Mostrar / ocultar navbar según scroll
   useEffect(() => {
     const handleScroll = () => {
       const current = window.scrollY;
@@ -26,6 +28,7 @@ function AppNavbar() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  // 🔹 Cerrar el collapse al cambiar de ruta
   useEffect(() => setExpanded(false), [location.pathname]);
 
   const handleLogout = () => {
@@ -47,6 +50,7 @@ function AppNavbar() {
         fixed="top"
       >
         <Container>
+          {/* 🔹 Logo clickable */}
           <Navbar.Brand as={Link} to="/" onClick={() => window.scrollTo(0, 0)}>
             <img
               src="/img/Logo.png"
@@ -81,14 +85,17 @@ function AppNavbar() {
                 Asignaturas
               </Nav.Link>
 
-              <Nav.Link
-                as={Link}
-                to="/mis-asignaturas"
-                active={location.pathname === "/mis-asignaturas"}
-                className="py-2"
-              >
-                Mis Asignaturas
-              </Nav.Link>
+              {/* 🔹 Solo visible para estudiantes */}
+              {role !== "admin" && (
+                <Nav.Link
+                  as={Link}
+                  to="/mis-asignaturas"
+                  active={location.pathname === "/mis-asignaturas"}
+                  className="py-2"
+                >
+                  Mis Asignaturas
+                </Nav.Link>
+              )}
 
               {/* 🔹 Solo visible para administradores */}
               {role === "admin" && (
@@ -114,10 +121,14 @@ function AppNavbar() {
               )}
             </Nav>
 
-            {/* 🔹 Ícono de perfil */}
+            {/* 🔹 Ícono perfil */}
             <div
               onClick={() => setShowModal(true)}
-              style={{ cursor: "pointer", display: "flex", alignItems: "center" }}
+              style={{
+                cursor: "pointer",
+                display: "flex",
+                alignItems: "center",
+              }}
               title="Ver perfil"
             >
               <PersonCircle size={36} color="#333" />
@@ -126,8 +137,15 @@ function AppNavbar() {
         </Container>
       </Navbar>
 
-      {/* Modal perfil */}
-      <Modal show={showModal} onHide={() => setShowModal(false)} centered className="modal-perfil">
+      {/* 🔹 Modal Perfil estilizado */}
+      <Modal
+        show={showModal}
+        onHide={() => setShowModal(false)}
+        centered
+        className="modal-perfil"
+        backdrop={true}
+        keyboard={true}
+      >
         <div className="modal-perfil-header">
           <Modal.Header closeButton closeVariant="white">
             <Modal.Title>Perfil del Usuario</Modal.Title>
@@ -135,14 +153,20 @@ function AppNavbar() {
         </div>
 
         <div className="modal-perfil-body text-center">
-          <img src="/img/Logo.png" alt="Logo Calificador de Profesores" className="perfil-logo" />
+          <img
+            src="/img/Logo.png"
+            alt="Logo Calificador de Profesores"
+            className="perfil-logo"
+          />
+
           <h5 className="perfil-titulo">Sesión activa</h5>
+
           <p className="perfil-email">
             <strong>{usuarioEmail}</strong>
           </p>
 
           {role && (
-            <p className="text-muted" style={{ fontSize: "0.9rem" }}>
+            <p className="text-muted mb-0" style={{ fontSize: "0.9rem" }}>
               Rol: <strong>{role}</strong>
             </p>
           )}

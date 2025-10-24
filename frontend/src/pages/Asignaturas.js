@@ -70,20 +70,24 @@ export default function Asignaturas() {
 
   return (
     <Container style={{ marginTop: 100 }}>
-      <div className="d-flex align-items-center justify-content-between mb-3">
-        <h2 className="mb-0 fw-bold">Asignaturas</h2>
-        <div style={{ maxWidth: 420, width: "100%" }}>
-          <Form
-            className="d-flex gap-2"
-            onSubmit={(e) => e.preventDefault()} // 🔹 Evita refresco con Enter
-          >
+      <Row className="align-items-center mb-4 gy-3">
+        {/* Título */}
+        <Col xs={12} md="auto" className="text-md-start text-center">
+          <h2 className="fw-bold mb-0">Asignaturas</h2>
+        </Col>
+
+        {/* Buscador */}
+        <Col xs={12} md={6} lg={5} className="ms-md-auto">
+          <Form className="d-flex gap-2 justify-content-center justify-content-md-end" onSubmit={(e) => e.preventDefault()}>
             <Form.Control
+              type="text"
               placeholder="Buscar asignaturas..."
               value={query}
               onChange={(e) => {
                 setQuery(e.target.value);
                 setCurrentPage(1);
               }}
+              className="shadow-sm"
             />
             {query && (
               <Button variant="outline-secondary" onClick={() => setQuery("")}>
@@ -91,8 +95,9 @@ export default function Asignaturas() {
               </Button>
             )}
           </Form>
-        </div>
-      </div>
+        </Col>
+      </Row>
+
 
       {loading ? (
         <div className="text-center mt-5">

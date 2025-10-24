@@ -63,26 +63,33 @@ export default function Profesores() {
   return (
     <div className="profesores-page">
       <Container style={{ marginTop: 100 }}>
-        <div className="d-flex align-items-center justify-content-between mb-3">
-          <h2 className="mb-0 fw-bold">Profesores</h2>
-          <div style={{ maxWidth: 480, width: "100%" }}>
+        {/* 🔹 Encabezado responsivo */}
+        <Row className="align-items-center mb-4 gy-3">
+          <Col xs={12} md="auto" className="text-md-start text-center">
+            <h2 className="fw-bold mb-0">Profesores</h2>
+          </Col>
+
+          <Col xs={12} md={7} lg={6} className="ms-md-auto">
             <Form
-              className="d-flex gap-2"
-              onSubmit={(e) => e.preventDefault()} // 🔹 Evita refresco con Enter
+              className="d-flex flex-wrap gap-2 justify-content-center justify-content-md-end"
+              onSubmit={(e) => e.preventDefault()}
             >
               <Form.Control
+                type="text"
                 placeholder="Buscar profesores..."
                 value={query}
                 onChange={(e) => {
                   setQuery(e.target.value);
                   setCurrentPage(1);
                 }}
+                className="shadow-sm"
+                style={{ flex: "1 1 200px", minWidth: "200px" }}
               />
               <Form.Select
                 className="home-filter-select"
                 value={campusFilter}
                 onChange={(e) => setCampusFilter(e.target.value)}
-                style={{ maxWidth: 180 }}
+                style={{ minWidth: "170px" }}
               >
                 <option value="all">Todos los campus</option>
                 {campusList.map((c) => (
@@ -92,8 +99,8 @@ export default function Profesores() {
                 ))}
               </Form.Select>
             </Form>
-          </div>
-        </div>
+          </Col>
+        </Row>
 
         {loading ? (
           <div className="text-center mt-5">

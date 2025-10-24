@@ -51,11 +51,11 @@ router.get("/", requireAuth, async (req, res) => {
         path: "comentarioId",
         model: "Calificacion",
         populate: {
-          path: "estudianteId",
-          model: "User",
+          path: "estudianteId", // ✅ este es el campo real
+          model: "User",        // ✅ coincide con tu modelo User
           select: "email",
         },
-        select: "comentario createdAt usuario",
+        select: "comentario createdAt estudianteId", // ✅ importante
       })
       .populate({
         path: "profesorId",
@@ -64,7 +64,7 @@ router.get("/", requireAuth, async (req, res) => {
       })
       .populate({
         path: "usuarioId",
-        model: "User", // Asegúrate que coincide con tu modelo de usuario
+        model: "User",
         select: "email",
       });
 

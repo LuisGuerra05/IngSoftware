@@ -71,7 +71,7 @@ export default function Moderacion() {
         </Alert>
       ) : reportes.length === 0 ? (
         <Alert variant="info" className="text-center">
-          No hay reportes pendientes por revisar 🎉
+          No hay reportes pendientes por revisar
         </Alert>
       ) : (
         <Card className="shadow-sm border-0 p-3">
@@ -96,8 +96,7 @@ export default function Moderacion() {
                   : "—";
                 const profesor = r.profesorId?.nombre || "Desconocido";
 
-                const usuarioComentario =
-                  r.comentarioId?.usuario?.email || "No registrado"; // 👈 NUEVO
+                const usuarioComentario = r.comentarioId?.estudianteId?.email || "No registrado";
                 const usuarioReporte = r.usuarioId?.email || "Anónimo";
 
                 const fechaReporte = new Date(r.fecha).toLocaleDateString("es-CL");

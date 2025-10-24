@@ -10,7 +10,7 @@ const calificacionSchema = new mongoose.Schema(
     },
     estudianteId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Usuario",
+      ref: "User",
       required: true,
     },
     claridadComunicacion: { type: Number, min: 1, max: 5, required: true },

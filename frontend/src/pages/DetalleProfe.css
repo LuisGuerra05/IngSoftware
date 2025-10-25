@@ -295,3 +295,52 @@
     transform: translateY(0);
   }
 }
+
+/* ===== Ajustes para el menú desplegable de comentarios ===== */
+.dropdown-menu {
+  z-index: 3000 !important; /* Garantiza que quede encima de todo */
+  position: absolute !important;
+  transform: translate3d(0, 0, 0) !important;
+  margin-top: 4px !important;
+  border-radius: 10px !important;
+  border: 1px solid #e5e7eb !important;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12) !important;
+  animation: fadeInUp 0.25s ease forwards;
+  background: #fff !important;
+  overflow: visible !important;
+}
+
+/* Asegura que el contenedor del comentario no corte el menú */
+.comentarios-container,
+.comentario-item {
+  overflow: visible !important;
+}
+
+/* Estilo del botón de menú */
+.dropdown-toggle {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 4px 6px !important;
+}
+
+.dropdown-toggle::after {
+  display: none !important; /* oculta el triángulo del botón */
+}
+
+/* Estilo del ítem "Reportar" */
+.dropdown-item {
+  display: flex !important;
+  align-items: center !important;
+  gap: 6px;
+  font-weight: 500 !important;
+  color: #b00020 !important;
+  padding: 8px 14px !important;
+  transition: all 0.2s ease;
+  border-radius: 8px !important;
+}
+
+.dropdown-item:hover {
+  background: rgba(176, 0, 32, 0.08) !important;
+  color: #8a001a !important;
+}

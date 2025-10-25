@@ -305,7 +305,7 @@ export default function DetalleProfe() {
                       );
                     })
                 ) : (
-                  <p className="text-muted">No hay comentarios disponibles.</p>
+                  <p className="text-muted">No hay comentarios registrados.</p>
                 )}
               </div>
             </Col>

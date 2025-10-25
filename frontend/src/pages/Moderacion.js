@@ -29,7 +29,6 @@ export default function Moderacion() {
 
   const token = localStorage.getItem("token");
 
-  // === Cargar reportes ===
   const cargarReportes = async () => {
     try {
       setLoading(true);
@@ -47,7 +46,6 @@ export default function Moderacion() {
     cargarReportes();
   }, []);
 
-  // === Mostrar toast elegante ===
   const mostrarToast = (mensaje, color = "success") => {
     setToastMensaje(mensaje);
     setToastColor(color);
@@ -55,7 +53,6 @@ export default function Moderacion() {
     setTimeout(() => setShowToast(false), 4000);
   };
 
-  // === Confirmar eliminación ===
   const confirmarEliminar = async () => {
     if (!reporteSeleccionado) return;
     try {
@@ -81,15 +78,12 @@ export default function Moderacion() {
     }
   };
 
-  // === Mantener comentario ===
   const handleMantener = async (id) => {
     try {
       const data = await actualizarEstadoReporte(token, id, "mantener");
 
       setReportes((prev) =>
-        prev.map((r) =>
-          r._id === id ? { ...r, estado: "revisado" } : r
-        )
+        prev.map((r) => (r._id === id ? { ...r, estado: "revisado" } : r))
       );
 
       mostrarToast(data.message || "Comentario mantenido y reporte revisado.", "success");
@@ -105,8 +99,7 @@ export default function Moderacion() {
         <Col xs={12} md={8}>
           <h1 className="moderacion-title fw-bold">Panel de Moderación</h1>
           <p className="moderacion-subtitle text-muted">
-            Revisa los comentarios reportados y decide si mantenerlos o
-            eliminarlos.
+            Revisa los comentarios reportados y decide si mantenerlos o eliminarlos.
           </p>
         </Col>
       </Row>
@@ -135,6 +128,7 @@ export default function Moderacion() {
                   <th>Profesor</th>
                   <th>Usuario que comentó</th>
                   <th>Usuario que reportó</th>
+                  <th>Motivo del Reporte</th>
                   <th>Fecha del Reporte</th>
                   <th>Estado</th>
                   <th className="text-center">Acciones</th>
@@ -167,6 +161,7 @@ export default function Moderacion() {
                       <td>{profesor}</td>
                       <td>{usuarioComentario}</td>
                       <td>{usuarioReporte}</td>
+                      <td>{r.motivo || "—"}</td>
                       <td>{fechaReporte}</td>
                       <td>
                         <Badge
@@ -193,7 +188,6 @@ export default function Moderacion() {
                                 setReporteSeleccionado(r);
                                 setShowConfirmModal(true);
                               }}
-                              className="btn-accion"
                             >
                               Eliminar comentario
                             </Button>
@@ -201,7 +195,6 @@ export default function Moderacion() {
                               variant="outline-success"
                               size="sm"
                               onClick={() => handleMantener(r._id)}
-                              className="btn-accion"
                             >
                               Mantener comentario
                             </Button>
@@ -221,12 +214,11 @@ export default function Moderacion() {
         </Card>
       )}
 
-      {/* ⚠️ Modal de confirmación */}
+      {/* Modal confirmación */}
       <Modal
         show={showConfirmModal}
         onHide={() => setShowConfirmModal(false)}
         centered
-        className="modal-confirmacion"
       >
         <Modal.Body className="text-center p-4">
           <svg
@@ -234,27 +226,21 @@ export default function Moderacion() {
             width="50"
             height="50"
             fill="currentColor"
-            className="bi bi-exclamation-triangle-fill text-warning mb-3 animate-pulse"
+            className="bi bi-exclamation-triangle-fill text-warning mb-3"
             viewBox="0 0 16 16"
           >
             <path d="M8.982 1.566a1.13 1.13 0 0 0-1.964 0L.165 13.233c-.457.778.091 1.767.982 1.767h13.706c.89 0 1.438-.99.982-1.767L8.982 1.566zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5zm.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2z" />
           </svg>
-
           <h5 className="fw-bold mb-2">¿Eliminar este comentario?</h5>
           <p className="text-muted mb-4">
             Esta acción eliminará el comentario reportado y no se puede deshacer.
           </p>
-
           <div className="d-flex justify-content-center gap-3">
-            <Button
-              variant="secondary"
-              onClick={() => setShowConfirmModal(false)}
-            >
+            <Button variant="secondary" onClick={() => setShowConfirmModal(false)}>
               Cancelar
             </Button>
             <Button
               variant="outline-danger"
-              className="btn-eliminar-confirm"
               onClick={confirmarEliminar}
             >
               Sí, eliminar
@@ -263,7 +249,7 @@ export default function Moderacion() {
         </Modal.Body>
       </Modal>
 
-      {/* ✅ Toast elegante */}
+      {/* Toast */}
       <ToastContainer className="toast-container-fijo">
         {showToast && (
           <Toast

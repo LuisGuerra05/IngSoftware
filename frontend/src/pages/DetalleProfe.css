@@ -344,3 +344,49 @@
   background: rgba(176, 0, 32, 0.08) !important;
   color: #8a001a !important;
 }
+
+
+/* ===== Modal de reporte ===== */
+.modal-reporte .modal-content {
+  border-radius: 16px;
+  border: none;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+}
+
+.modal-reporte .modal-header {
+  background: linear-gradient(135deg, #b00020, #6d0015);
+  color: #fff;
+  border-bottom: none;
+}
+
+.modal-reporte .modal-title {
+  font-weight: 600;
+}
+
+.modal-reporte .modal-body {
+  background: #fafafa;
+  padding: 1.5rem;
+}
+
+.modal-reporte .form-check-label {
+  font-weight: 500;
+  color: #333;
+}
+
+.modal-reporte .form-control {
+  border-radius: 10px;
+  border: 1px solid #d1d5db;
+}
+
+.modal-reporte .btn-outline-danger {
+  background: linear-gradient(135deg, #b00020, #6d0015);
+  border: none;
+  color: #fff;
+  border-radius: 10px;
+  font-weight: 500;
+}
+
+.modal-reporte .btn-outline-danger:hover {
+  background: linear-gradient(135deg, #8a001a, #4d000f);
+}
+

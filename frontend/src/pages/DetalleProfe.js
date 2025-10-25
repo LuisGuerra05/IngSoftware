@@ -17,6 +17,8 @@ import {
   Toast,
   ToastContainer,
   Dropdown,
+  Modal,
+  Form,
 } from "react-bootstrap";
 import {
   Mortarboard,
@@ -44,7 +46,13 @@ export default function DetalleProfe() {
   const [showToast, setShowToast] = useState(false);
   const [toastMensaje, setToastMensaje] = useState("");
   const [toastColor, setToastColor] = useState("success");
-  const [actualizarStats, setActualizarStats] = useState(false); // 🔹 Nuevo estado
+  const [actualizarStats, setActualizarStats] = useState(false);
+
+  // 🔹 Estados nuevos para el reporte
+  const [showModalReporte, setShowModalReporte] = useState(false);
+  const [comentarioAReportar, setComentarioAReportar] = useState(null);
+  const [motivoSeleccionado, setMotivoSeleccionado] = useState("");
+  const [motivoPersonalizado, setMotivoPersonalizado] = useState("");
 
   const token = localStorage.getItem("token");
   const role = localStorage.getItem("role");
@@ -101,10 +109,7 @@ export default function DetalleProfe() {
         mensaje = "Evaluación eliminada correctamente";
         color = "danger";
       }
-
       mostrarToast(mensaje, color);
-
-      // 🔹 Forzar actualización de estadísticas
       setActualizarStats((prev) => !prev);
     }
   };
@@ -117,34 +122,35 @@ export default function DetalleProfe() {
     setTimeout(() => setShowToast(false), 4000);
   };
 
-  // === Manejar reporte de comentario ===
-  const handleReportar = async (comentario) => {
+  // === Manejar inicio del reporte ===
+  const handleReportar = (comentario) => {
+    setComentarioAReportar(comentario);
+    setMotivoSeleccionado("");
+    setMotivoPersonalizado("");
+    setShowModalReporte(true);
+  };
+
+  // === Confirmar envío del reporte ===
+  const confirmarReporte = async () => {
     try {
-      const comentarioId = comentario._id || comentario.id;
+      const comentarioId = comentarioAReportar?._id || comentarioAReportar?.id;
       if (!comentarioId) {
         mostrarToast("No se pudo identificar el comentario.", "danger");
         return;
       }
 
-      const yaReportado =
-        comentario.reportes?.some((r) => r.usuarioId === userId) || false;
+      const motivoFinal =
+        motivoSeleccionado === "otro" && motivoPersonalizado.trim()
+          ? motivoPersonalizado
+          : motivoSeleccionado || "Comentario inapropiado";
 
-      if (yaReportado) {
-        mostrarToast("Ya has reportado este comentario anteriormente.", "info");
-        return;
-      }
-
-      await crearReporte(token, comentarioId, profesor._id, "Comentario inapropiado");
-      mostrarToast("Comentario reportado correctamente", "success");
+      await crearReporte(token, comentarioId, profesor._id, motivoFinal);
+      mostrarToast("Reporte enviado correctamente", "success");
+      setShowModalReporte(false);
     } catch (err) {
       console.error("Error al enviar reporte:", err);
-      if (err.response && err.response.data && err.response.data.message) {
-        const msg = err.response.data.message;
-        if (msg.includes("Ya reportaste")) {
-          mostrarToast("Ya has reportado este comentario anteriormente.", "info");
-        } else {
-          mostrarToast(msg, "danger");
-        }
+      if (err.response?.data?.message?.includes("Ya reportaste")) {
+        mostrarToast("Ya has reportado este comentario anteriormente.", "info");
       } else {
         mostrarToast("Error al enviar reporte", "danger");
       }
@@ -285,9 +291,7 @@ export default function DetalleProfe() {
                                   <ThreeDotsVertical />
                                 </Dropdown.Toggle>
                                 <Dropdown.Menu>
-                                  <Dropdown.Item
-                                    onClick={() => handleReportar(c)}
-                                  >
+                                  <Dropdown.Item onClick={() => handleReportar(c)}>
                                     <Flag
                                       size={14}
                                       className="me-2 text-danger"
@@ -315,14 +319,13 @@ export default function DetalleProfe() {
               <h5 className="detalle-profe-subtitulo">
                 Estadísticas y valoraciones
               </h5>
-              {/* 🔹 Se vuelve a renderizar cuando actualizarStats cambia */}
               <EstadisticasProfe profesorId={id} key={actualizarStats} />
             </Col>
           </Row>
         </Card>
       </Container>
 
-      {/* Modales */}
+      {/* Modales secundarios */}
       <ModalAsignatura
         show={showModal}
         handleClose={handleCloseModal}
@@ -340,7 +343,70 @@ export default function DetalleProfe() {
         />
       )}
 
-      {/* ✅ Toast fijo elegante */}
+      {/* 🔹 Modal de reporte */}
+      <Modal
+        show={showModalReporte}
+        onHide={() => setShowModalReporte(false)}
+        centered
+        className="modal-reporte"
+      >
+        <Modal.Header closeButton>
+          <Modal.Title>Reportar comentario</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <p className="text-muted mb-3">
+            Indica el motivo por el cual consideras que este comentario debe ser
+            revisado.
+          </p>
+          <Form>
+            <div className="d-flex flex-column gap-2">
+              {[
+                "Lenguaje inapropiado",
+                "Contenido ofensivo",
+                "Spam o autopromoción",
+                "Información falsa",
+                "Violación de privacidad",
+                "otro",
+              ].map((motivo, idx) => (
+                <Form.Check
+                  key={idx}
+                  type="radio"
+                  id={`motivo-${idx}`}
+                  name="motivo"
+                  label={motivo === "otro" ? "Otro (especificar)" : motivo}
+                  value={motivo}
+                  checked={motivoSeleccionado === motivo}
+                  onChange={(e) => setMotivoSeleccionado(e.target.value)}
+                />
+              ))}
+              {motivoSeleccionado === "otro" && (
+                <Form.Control
+                  as="textarea"
+                  rows={2}
+                  placeholder="Describe brevemente el motivo..."
+                  value={motivoPersonalizado}
+                  onChange={(e) => setMotivoPersonalizado(e.target.value)}
+                  className="mt-2"
+                />
+              )}
+            </div>
+          </Form>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={() => setShowModalReporte(false)}>
+            Cancelar
+          </Button>
+          <Button
+            variant="outline-danger"
+            onClick={confirmarReporte}
+            disabled={!motivoSeleccionado}
+          >
+            Enviar reporte
+          </Button>
+        </Modal.Footer>
+      </Modal>
+
+      {/* Toast */}
       <ToastContainer className="toast-container-fijo">
         {showToast && (
           <Toast

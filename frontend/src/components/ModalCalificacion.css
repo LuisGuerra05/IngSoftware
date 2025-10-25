@@ -87,27 +87,47 @@
   color: #333;
 }
 
-/* Botones numéricos más pequeños, compactos y alineados a la izquierda */
+/* === Botones circulares de evaluación (1–5) === */
 .modal-calificacion .btn-group .btn,
 .modal-calificacion .d-flex .btn {
-  border-radius: 50%;
-  width: 32px;
-  height: 32px;
-  padding: 0;
-  margin-right: 6px;
+  width: 42px;               /* mismo ancho y alto para forma perfecta */
+  height: 42px;
+  border-radius: 50%;        /* círculo perfecto */
+  padding: 0 !important;
   display: flex;
   align-items: center;
   justify-content: center;
   font-weight: 600;
-  font-size: 0.9rem;
-  transition: all 0.2s ease;
+  font-size: 1rem;
+  color: #007bff;
+  border: 2px solid #007bff;
+  background-color: #fff;
+  margin: 4px;
+  transition: all 0.25s ease;
 }
 
-/* Contenedor de los botones: alineado a la izquierda y compacto */
+/* Hover */
+.modal-calificacion .btn-group .btn:hover,
+.modal-calificacion .d-flex .btn:hover {
+  background-color: #007bff;
+  color: #fff;
+  transform: scale(1.05);
+}
+
+/* Estado activo (seleccionado) */
+.modal-calificacion .btn-group .btn.active,
+.modal-calificacion .d-flex .btn.active {
+  background-color: #007bff;
+  color: #fff;
+  border-color: #0056b3;
+  box-shadow: 0 0 0 4px rgba(0, 123, 255, 0.15);
+}
+
+/* Contenedor alineado y responsivo */
 .modal-calificacion .form-group .d-flex {
   justify-content: flex-start !important;
-  gap: 0.4rem;
-  flex-wrap: nowrap;
+  gap: 0.5rem;
+  flex-wrap: wrap; /* ahora se acomodan bien en pantallas pequeñas */
 }
 
 

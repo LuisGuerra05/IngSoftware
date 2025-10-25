@@ -270,3 +270,55 @@
   transform: none !important;
   box-shadow: none !important;
 }
+
+/* === BOTONES EN FOOTER RESPONSIVE === */
+@media (max-width: 576px) {
+  .modal-calificacion .modal-footer-fixed {
+    flex-direction: column !important;   /* apila los botones verticalmente */
+    align-items: stretch !important;     /* ocupa todo el ancho */
+    gap: 0.6rem !important;
+  }
+
+  .modal-calificacion .modal-footer-fixed .btn {
+    width: 100% !important;              /* botones a ancho completo */
+    font-size: 0.95rem !important;
+    padding: 0.75rem !important;
+    border-radius: 10px !important;
+  }
+
+  /* Ajuste de modal confirmación */
+  .modal-confirmacion .modal-body .btn {
+    width: 100% !important;
+    font-size: 0.95rem !important;
+    padding: 0.75rem !important;
+  }
+
+  .modal-confirmacion .d-flex.justify-content-center.gap-3 {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 0.6rem !important;
+  }
+}
+
+/* === CENTRADO PERFECTO DEL TEXTO EN BOTONES === */
+.modal-calificacion .btn,
+.modal-confirmacion .btn {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  line-height: 1.2 !important;
+  padding: 0.75rem 1.25rem !important;
+  font-weight: 600 !important;
+  text-align: center !important;
+  vertical-align: middle !important;
+}
+
+/* Ajuste específico para móviles */
+@media (max-width: 576px) {
+  .modal-calificacion .btn,
+  .modal-confirmacion .btn {
+    font-size: 1rem !important;
+    line-height: 1.3 !important;
+    padding: 0.8rem 1.2rem !important;
+  }
+}

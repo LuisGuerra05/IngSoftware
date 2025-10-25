@@ -215,3 +215,44 @@ hr {
   align-items: center;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
 }
+
+/* === AJUSTE RESPONSIVO DEL TOTAL DE EVALUACIONES === */
+.total-evaluaciones {
+  background: rgba(255, 193, 7, 0.15);
+  border: 1px solid rgba(255, 193, 7, 0.3);
+  border-radius: 10px;
+  padding: 4px 10px;
+  font-size: 0.9rem;
+  color: #333;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+  white-space: nowrap;         /* evita que se corte el texto */
+}
+
+/* 🔹 Alineación y tamaño correctos en móviles */
+@media (max-width: 576px) {
+  .estadisticas-card .d-flex.justify-content-between {
+    flex-direction: column !important;
+    align-items: center !important;
+    gap: 0.6rem;
+    text-align: center;
+  }
+
+  .total-evaluaciones {
+    width: auto;
+    max-width: 100%;
+    font-size: 0.95rem;
+    padding: 6px 12px;
+    white-space: normal;       /* permite varias líneas si es largo */
+    text-align: center;
+  }
+
+  .estadisticas-titulo {
+    font-size: 1.15rem;
+  }
+}
+
+
+

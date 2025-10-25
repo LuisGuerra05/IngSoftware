@@ -233,7 +233,7 @@ export default function ModalCalificacion({
             ) : calificacionExistente ? (
               "Actualizar"
             ) : (
-              "Enviar Calificación"
+              "Enviar"
             )}
           </Button>
         </Modal.Footer>

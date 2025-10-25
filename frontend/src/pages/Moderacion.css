@@ -124,3 +124,55 @@
     padding: 8px;
   }
 }
+
+/* === Botones de acción con estilo consistente === */
+.btn-accion-rojo {
+  background: linear-gradient(135deg, #b00020, #6d0015) !important;
+  color: #fff !important;
+  border: none !important;
+  border-radius: 10px !important;
+  padding: 6px 14px !important;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.btn-accion-rojo:hover {
+  background: linear-gradient(135deg, #8a001a, #4d000f) !important;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(176, 0, 32, 0.25);
+}
+
+.btn-accion-verde {
+  background: linear-gradient(135deg, #009d5a, #007d47) !important;
+  color: #fff !important;
+  border: none !important;
+  border-radius: 10px !important;
+  padding: 6px 14px !important;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.btn-accion-verde:hover {
+  background: linear-gradient(135deg, #007d47, #005f36) !important;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 157, 90, 0.25);
+}
+
+
+/* === Botón azul global alineado a la derecha === */
+.btn-eliminar-todos-azul {
+  background: linear-gradient(135deg, #0056b3, #003d82) !important;
+  color: #fff !important;
+  border: none !important;
+  border-radius: 10px !important;
+  padding: 8px 18px !important;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.btn-eliminar-todos-azul:hover {
+  background: linear-gradient(135deg, #00408f, #002b64) !important;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 86, 179, 0.25);
+}
+  

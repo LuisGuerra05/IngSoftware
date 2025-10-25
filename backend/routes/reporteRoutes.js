@@ -121,4 +121,29 @@ router.put("/:id", requireAuth, async (req, res) => {
   }
 });
 
+// 🗑️ Eliminar un reporte por ID (admin o autenticado)
+router.delete("/:id", requireAuth, async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const reporte = await Reporte.findById(id);
+    if (!reporte) {
+      return res.status(404).json({ ok: false, error: "Reporte no encontrado." });
+    }
+
+    // 🔹 Eliminar el reporte de la base de datos
+    await Reporte.findByIdAndDelete(id);
+
+    res.json({
+      ok: true,
+      message: "Reporte eliminado correctamente de la base de datos.",
+    });
+  } catch (error) {
+    console.error("❌ Error al eliminar reporte:", error);
+    res
+      .status(500)
+      .json({ ok: false, error: "Error interno al eliminar el reporte." });
+  }
+});
+
 module.exports = router;

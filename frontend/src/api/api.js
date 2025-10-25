@@ -111,3 +111,15 @@ export async function actualizarEstadoReporte(token, id, accion) {
   return data;
 }
 
+export async function deleteReporte(token, id) {
+  try {
+    const { data } = await axios.delete(`/reportes/${id}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    return data;
+  } catch (err) {
+    console.error("❌ Error en deleteReporte:", err.response?.data || err.message);
+    throw err;
+  }
+}
+

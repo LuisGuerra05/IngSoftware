@@ -13,7 +13,7 @@ import {
   Toast,
   ToastContainer,
 } from "react-bootstrap";
-import { getReportes, actualizarEstadoReporte } from "../api/api";
+import { getReportes, actualizarEstadoReporte, deleteReporte } from "../api/api";
 import { CheckCircle, Trash3 } from "react-bootstrap-icons";
 import "./Moderacion.css";
 
@@ -22,6 +22,7 @@ export default function Moderacion() {
   const [reportes, setReportes] = useState([]);
   const [error, setError] = useState(null);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [showBulkModal, setShowBulkModal] = useState(false);
   const [reporteSeleccionado, setReporteSeleccionado] = useState(null);
   const [showToast, setShowToast] = useState(false);
   const [toastMensaje, setToastMensaje] = useState("");
@@ -53,45 +54,72 @@ export default function Moderacion() {
     setTimeout(() => setShowToast(false), 4000);
   };
 
+  // ✅ Eliminar un reporte individualmente (DELETE real)
   const confirmarEliminar = async () => {
     if (!reporteSeleccionado) return;
     try {
-      const data = await actualizarEstadoReporte(
-        token,
-        reporteSeleccionado._id,
-        "eliminar"
-      );
+      await deleteReporte(token, reporteSeleccionado._id);
 
       setReportes((prev) =>
-        prev.map((r) =>
-          r._id === reporteSeleccionado._id
-            ? { ...r, estado: "descartado" }
-            : r
-        )
+        prev.filter((r) => r._id !== reporteSeleccionado._id)
       );
 
       setShowConfirmModal(false);
-      mostrarToast(data.message || "Comentario eliminado correctamente.", "danger");
+      mostrarToast("Reporte eliminado permanentemente.", "danger");
     } catch (err) {
       console.error("Error al eliminar reporte:", err);
       mostrarToast("Hubo un error al eliminar el reporte.", "danger");
     }
   };
 
+  // ✅ Mantener comentario → actualizar estado
   const handleMantener = async (id) => {
     try {
       const data = await actualizarEstadoReporte(token, id, "mantener");
-
       setReportes((prev) =>
         prev.map((r) => (r._id === id ? { ...r, estado: "revisado" } : r))
       );
-
       mostrarToast(data.message || "Comentario mantenido y reporte revisado.", "success");
     } catch (err) {
       console.error("Error al actualizar reporte:", err);
       mostrarToast("Hubo un error al actualizar el reporte.", "danger");
     }
   };
+
+  // ✅ Eliminar todos los revisados/descartados de la base de datos
+  const eliminarTodosRevisados = async () => {
+    try {
+      const revisados = reportes.filter(
+        (r) => r.estado === "revisado" || r.estado === "descartado"
+      );
+
+      if (revisados.length === 0) {
+        mostrarToast("No hay comentarios revisados para eliminar.", "info");
+        setShowBulkModal(false);
+        return;
+      }
+
+      // 🔹 Elimina cada reporte revisado del backend
+      for (const rep of revisados) {
+        await deleteReporte(token, rep._id);
+      }
+
+      // 🔹 Elimina del estado local también
+      setReportes((prev) =>
+        prev.filter((r) => r.estado === "pendiente")
+      );
+
+      setShowBulkModal(false);
+      mostrarToast("Se eliminaron todos los reportes revisados.", "success");
+    } catch (err) {
+      console.error("Error al eliminar revisados:", err);
+      mostrarToast("Error al eliminar los reportes revisados.", "danger");
+    }
+  };
+
+  const hayRevisados = reportes.some(
+    (r) => r.estado === "revisado" || r.estado === "descartado"
+  );
 
   return (
     <Container className="moderacion-container">
@@ -118,107 +146,123 @@ export default function Moderacion() {
           No hay reportes pendientes por revisar
         </Alert>
       ) : (
-        <Card className="moderacion-card shadow-sm border-0 p-3">
-          <div className="table-responsive">
-            <Table hover className="align-middle moderacion-table">
-              <thead>
-                <tr>
-                  <th>#</th>
-                  <th>Comentario Reportado</th>
-                  <th>Profesor</th>
-                  <th>Usuario que comentó</th>
-                  <th>Usuario que reportó</th>
-                  <th>Motivo del Reporte</th>
-                  <th>Fecha del Reporte</th>
-                  <th>Estado</th>
-                  <th className="text-center">Acciones</th>
-                </tr>
-              </thead>
-              <tbody>
-                {reportes.map((r, index) => {
-                  const comentario =
-                    r.comentarioId?.comentario || "Comentario no disponible";
-                  const fechaComentario = r.comentarioId?.createdAt
-                    ? new Date(r.comentarioId.createdAt).toLocaleDateString("es-CL")
-                    : "—";
-                  const profesor = r.profesorId?.nombre || "Desconocido";
-                  const usuarioComentario =
-                    r.comentarioId?.estudianteId?.email || "No registrado";
-                  const usuarioReporte = r.usuarioId?.email || "Anónimo";
-                  const fechaReporte = new Date(r.fecha).toLocaleDateString("es-CL");
+        <>
+          <Card className="moderacion-card shadow-sm border-0 p-3">
+            <div className="table-responsive">
+              <Table hover className="align-middle moderacion-table">
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th>Comentario Reportado</th>
+                    <th>Profesor</th>
+                    <th>Usuario que comentó</th>
+                    <th>Usuario que reportó</th>
+                    <th>Motivo del Reporte</th>
+                    <th>Fecha del Reporte</th>
+                    <th>Estado</th>
+                    <th className="text-center">Acciones</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {reportes.map((r, index) => {
+                    const comentario =
+                      r.comentarioId?.comentario || "Comentario no disponible";
+                    const fechaComentario = r.comentarioId?.createdAt
+                      ? new Date(r.comentarioId.createdAt).toLocaleDateString("es-CL")
+                      : "—";
+                    const profesor = r.profesorId?.nombre || "Desconocido";
+                    const usuarioComentario =
+                      r.comentarioId?.estudianteId?.email || "No registrado";
+                    const usuarioReporte = r.usuarioId?.email || "Anónimo";
+                    const fechaReporte = new Date(r.fecha).toLocaleDateString("es-CL");
 
-                  return (
-                    <tr key={r._id || index}>
-                      <td>{index + 1}</td>
-                      <td>
-                        <div>
-                          <strong>{comentario}</strong>
-                          <div className="text-muted small">
-                            Fecha del comentario: {fechaComentario}
+                    return (
+                      <tr key={r._id || index}>
+                        <td>{index + 1}</td>
+                        <td>
+                          <div>
+                            <strong>{comentario}</strong>
+                            <div className="text-muted small">
+                              Fecha del comentario: {fechaComentario}
+                            </div>
                           </div>
-                        </div>
-                      </td>
-                      <td>{profesor}</td>
-                      <td>{usuarioComentario}</td>
-                      <td>{usuarioReporte}</td>
-                      <td>{r.motivo || "—"}</td>
-                      <td>{fechaReporte}</td>
-                      <td>
-                        <Badge
-                          bg={
-                            r.estado === "pendiente"
-                              ? "warning"
-                              : r.estado === "revisado"
-                              ? "success"
-                              : "secondary"
-                          }
-                          text={r.estado === "pendiente" ? "dark" : "light"}
-                          className="estado-badge"
-                        >
-                          {r.estado.charAt(0).toUpperCase() + r.estado.slice(1)}
-                        </Badge>
-                      </td>
-                      <td className="text-center">
-                        {r.estado === "pendiente" ? (
-                          <div className="d-flex flex-wrap justify-content-center gap-2">
-                            <Button
-                              variant="outline-danger"
-                              size="sm"
-                              onClick={() => {
-                                setReporteSeleccionado(r);
-                                setShowConfirmModal(true);
-                              }}
-                            >
-                              Eliminar comentario
-                            </Button>
-                            <Button
-                              variant="outline-success"
-                              size="sm"
-                              onClick={() => handleMantener(r._id)}
-                            >
-                              Mantener comentario
-                            </Button>
-                          </div>
-                        ) : (
-                          <small className="text-muted fst-italic">
-                            Acción completada
-                          </small>
-                        )}
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </Table>
-          </div>
-        </Card>
+                        </td>
+                        <td>{profesor}</td>
+                        <td>{usuarioComentario}</td>
+                        <td>{usuarioReporte}</td>
+                        <td>{r.motivo || "—"}</td>
+                        <td>{fechaReporte}</td>
+                        <td>
+                          <Badge
+                            bg={
+                              r.estado === "pendiente"
+                                ? "warning"
+                                : r.estado === "revisado"
+                                ? "success"
+                                : "secondary"
+                            }
+                            text={r.estado === "pendiente" ? "dark" : "light"}
+                            className="estado-badge"
+                          >
+                            {r.estado.charAt(0).toUpperCase() + r.estado.slice(1)}
+                          </Badge>
+                        </td>
+                        <td className="text-center">
+                          {r.estado === "pendiente" ? (
+                            <div className="d-flex flex-wrap justify-content-center gap-2">
+                              <Button
+                                className="btn-accion-rojo"
+                                size="sm"
+                                onClick={() => {
+                                  setReporteSeleccionado(r);
+                                  setShowConfirmModal(true);
+                                }}
+                              >
+                                Eliminar
+                              </Button>
+                              <Button
+                                className="btn-accion-verde"
+                                size="sm"
+                                onClick={() => handleMantener(r._id)}
+                              >
+                                Mantener
+                              </Button>
+                            </div>
+                          ) : (
+                            <small className="text-muted fst-italic">
+                              Acción completada
+                            </small>
+                          )}
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </Table>
+            </div>
+          </Card>
+
+          {/* 🔹 Botón azul alineado a la izquierda */}
+          {hayRevisados && (
+            <div className="d-flex justify-content-start mt-3">
+              <Button
+                className="btn-eliminar-todos-azul"
+                onClick={() => setShowBulkModal(true)}
+              >
+                <Trash3 className="me-2" />
+                Eliminar todos los comentarios revisados
+              </Button>
+            </div>
+          )}
+        </>
       )}
 
-      {/* Modal confirmación */}
+      {/* ✅ Modal confirmación múltiple */}
       <Modal
-        show={showConfirmModal}
-        onHide={() => setShowConfirmModal(false)}
+        show={showBulkModal}
+        onHide={() => setShowBulkModal(false)}
         centered
+        className="modal-confirmacion"
       >
         <Modal.Body className="text-center p-4">
           <svg
@@ -226,30 +270,33 @@ export default function Moderacion() {
             width="50"
             height="50"
             fill="currentColor"
-            className="bi bi-exclamation-triangle-fill text-warning mb-3"
+            className="bi bi-exclamation-triangle-fill text-warning mb-3 animate-pulse"
             viewBox="0 0 16 16"
           >
             <path d="M8.982 1.566a1.13 1.13 0 0 0-1.964 0L.165 13.233c-.457.778.091 1.767.982 1.767h13.706c.89 0 1.438-.99.982-1.767L8.982 1.566zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5zm.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2z" />
           </svg>
-          <h5 className="fw-bold mb-2">¿Eliminar este comentario?</h5>
+
+          <h5 className="fw-bold mb-2">¿Eliminar todos los comentarios revisados?</h5>
           <p className="text-muted mb-4">
-            Esta acción eliminará el comentario reportado y no se puede deshacer.
+            Esta acción eliminará permanentemente todos los reportes marcados como revisados o descartados.
           </p>
+
           <div className="d-flex justify-content-center gap-3">
-            <Button variant="secondary" onClick={() => setShowConfirmModal(false)}>
+            <Button variant="secondary" onClick={() => setShowBulkModal(false)}>
               Cancelar
             </Button>
             <Button
-              variant="outline-danger"
-              onClick={confirmarEliminar}
+              variant="primary"
+              className="btn-eliminar-confirm"
+              onClick={eliminarTodosRevisados}
             >
-              Sí, eliminar
+              Sí, eliminar todo
             </Button>
           </div>
         </Modal.Body>
       </Modal>
 
-      {/* Toast */}
+      {/* ✅ Toast */}
       <ToastContainer className="toast-container-fijo">
         {showToast && (
           <Toast

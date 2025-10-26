@@ -14,7 +14,7 @@ function AppNavbar() {
   const navigate = useNavigate();
 
   const usuarioEmail = localStorage.getItem("usuario") || "usuario@alumnos.uai.cl";
-  const role = localStorage.getItem("role"); // 🔹 Rol del usuario
+  const role = localStorage.getItem("role");
 
   // 🔹 Mostrar / ocultar navbar según scroll
   useEffect(() => {
@@ -67,6 +67,16 @@ function AppNavbar() {
 
           <Navbar.Collapse id="main-navbar">
             <Nav className="me-auto">
+              {/* 🔹 NUEVA OPCIÓN: Inicio */}
+              <Nav.Link
+                as={Link}
+                to="/"
+                active={location.pathname === "/"}
+                className="py-2"
+              >
+                Inicio
+              </Nav.Link>
+
               <Nav.Link
                 as={Link}
                 to="/profesores"

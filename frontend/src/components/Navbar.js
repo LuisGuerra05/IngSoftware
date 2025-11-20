@@ -4,6 +4,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { PersonCircle } from "react-bootstrap-icons";
 import "./Navbar.css";
 import "./ModalPerfil.css";
+import { useAuth } from "../context/AuthContext";
 
 function AppNavbar() {
   const [show, setShow] = useState(true);
@@ -12,9 +13,10 @@ function AppNavbar() {
   const lastScroll = useRef(window.scrollY);
   const location = useLocation();
   const navigate = useNavigate();
+  const { user, logout } = useAuth();
 
-  const usuarioEmail = localStorage.getItem("usuario") || "usuario@alumnos.uai.cl";
-  const role = localStorage.getItem("role");
+  const usuarioEmail = user?.email || "usuario@alumnos.uai.cl";
+  const role = user?.role;
 
   // 🔹 Mostrar / ocultar navbar según scroll
   useEffect(() => {
@@ -32,10 +34,7 @@ function AppNavbar() {
   useEffect(() => setExpanded(false), [location.pathname]);
 
   const handleLogout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("usuario");
-    localStorage.removeItem("role");
-    navigate("/login");
+    logout();
   };
 
   return (
@@ -180,6 +179,7 @@ function AppNavbar() {
               Rol: <strong>{role}</strong>
             </p>
           )}
+
 
           <div className="text-center mt-4">
             <Button onClick={handleLogout} className="btn-cerrar-sesion">

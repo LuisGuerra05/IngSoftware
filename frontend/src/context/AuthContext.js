@@ -7,60 +7,74 @@ const AuthContext = createContext();
 export function AuthProvider({ children }) {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [user, setUser] = useState(null);
-  const [isLoading, setIsLoading] = useState(true); // ✅ Nuevo
+  const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
 
-  // ✅ Cargar sesión al iniciar la app
+  // Validar token al iniciar
   useEffect(() => {
     const token = localStorage.getItem("token");
+
     if (token) {
       try {
         const decoded = jwtDecode(token);
-        const role = decoded.role || localStorage.getItem("role") || "estudiante";
-        const email = decoded.email || localStorage.getItem("usuario");
+
+        // 🔥 VALIDACIÓN REAL DE EXPIRACIÓN
+        if (!decoded.exp || decoded.exp * 1000 < Date.now()) {
+          console.warn("⛔ Token expirado, cerrando sesión");
+          handleLogout(false);
+          setIsLoading(false);
+          return;
+        }
+
+        // 🔥 Email y rol SIEMPRE desde el JWT
+        const email = decoded.email;
+        const role = decoded.role;
 
         setUser({ email, role });
         setIsAuthenticated(true);
+
       } catch (err) {
         console.error("❌ Token inválido:", err);
         handleLogout(false);
       }
     }
-    setIsLoading(false); // ✅ Solo terminamos carga aquí
+
+    setIsLoading(false);
   }, []);
 
-  // ✅ Login
-  const handleLogin = (token, userEmail) => {
+  // Login
+  const handleLogin = (token) => {
     try {
       const decoded = jwtDecode(token);
-      const role = decoded.role || "estudiante";
 
+      // Solo guardamos token (seguro)
       localStorage.setItem("token", token);
-      localStorage.setItem("usuario", userEmail || decoded.email);
-      localStorage.setItem("role", role);
 
-      setUser({ email: userEmail || decoded.email, role });
+      setUser({
+        email: decoded.email,
+        role: decoded.role,
+      });
+
       setIsAuthenticated(true);
       navigate("/", { replace: true });
+
     } catch (err) {
       console.error("Error al decodificar token:", err);
     }
   };
 
-  // ✅ Logout
+  // Logout
   const handleLogout = (redirect = true) => {
     localStorage.removeItem("token");
-    localStorage.removeItem("usuario");
-    localStorage.removeItem("role");
+    localStorage.removeItem("misRamos");
+
     setUser(null);
     setIsAuthenticated(false);
+
     if (redirect) navigate("/login", { replace: true });
   };
 
-  if (isLoading) {
-    // ⏳ Evita redirecciones mientras se valida token
-    return null;
-  }
+  if (isLoading) return null;
 
   return (
     <AuthContext.Provider

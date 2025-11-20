@@ -4,17 +4,17 @@ import { useAuth } from "./context/AuthContext";
 
 /**
  * Protege rutas que requieren autenticación o un rol específico.
- * Si se pasa `requiredRole="admin"`, solo los administradores podrán acceder.
  */
 export default function ProtectedRoute({ children, requiredRole }) {
-  const { isAuthenticated } = useAuth();
-  const role = localStorage.getItem("role");
+  const { isAuthenticated, user } = useAuth();
 
+  // 🔒 Si NO está autenticado, fuera
   if (!isAuthenticated) {
     return <Navigate to="/login" replace />;
   }
 
-  if (requiredRole && role !== requiredRole) {
+  // 🔒 Validación de roles usando el contexto (NO localStorage)
+  if (requiredRole && user?.role !== requiredRole) {
     return <Navigate to="/" replace />;
   }
 

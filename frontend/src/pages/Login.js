@@ -50,7 +50,7 @@ export default function Login() {
       }
 
       // 🔹 Usar la función login del contexto (centraliza el flujo)
-      login(data.token, data.user?.email, data.user?.role);
+      login(data.token);
     } catch (err) {
       setErrorMsg(err.message || "No se pudo iniciar sesión");
     } finally {

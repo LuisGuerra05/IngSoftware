@@ -147,7 +147,7 @@ export default function ModalCalificacion({
             {renderNumericRating("claridadComunicacion", "Claridad al comunicar")}
             {renderNumericRating("dominioContenido", "Dominio del contenido")}
             {renderNumericRating("motivacion", "Motivación")}
-            {renderNumericRating("exigenciaCarga", "Exigencia y carga de trabajo")}
+            {renderNumericRating("exigenciaCarga", "Justicia en la exigencia")}
             {renderNumericRating("disponibilidadApoyo", "Disponibilidad y apoyo")}
 
             <Form.Group className="mb-3 mt-2">

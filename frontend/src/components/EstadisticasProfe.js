@@ -37,7 +37,7 @@ export default function EstadisticasProfe({ profesorId }) {
     { key: "claridadComunicacion", label: "Claridad y comunicación" },
     { key: "dominioContenido", label: "Dominio del contenido" },
     { key: "motivacion", label: "Motivación al enseñar" },
-    { key: "exigenciaCarga", label: "Exigencia y carga de trabajo" },
+    { key: "exigenciaCarga", label: "Justicia en la exigencia" },
     { key: "disponibilidadApoyo", label: "Disponibilidad y apoyo" },
   ];
 

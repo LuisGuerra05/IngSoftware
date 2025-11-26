@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const Reporte = require("../models/Reporte");
 const Calificacion = require("../models/Calificacion");
+const User = require("../models/User");
 const requireAuth = require("../middleware/requireAuth");
 
 // 📌 Crear nuevo reporte
@@ -14,15 +15,14 @@ router.post("/", requireAuth, async (req, res) => {
       return res.status(400).json({ ok: false, error: "Datos incompletos." });
     }
 
-    // 🔹 Evitar duplicados del mismo usuario
+    // Evitar duplicados del mismo usuario
     const existe = await Reporte.findOne({ comentarioId, usuarioId });
     if (existe) {
       return res
-        .status(409) // 409 = conflicto (ya existe)
+        .status(409)
         .json({ ok: false, message: "Ya reportaste este comentario." });
     }
 
-    // 🔹 Crear nuevo reporte
     const nuevoReporte = new Reporte({
       comentarioId,
       profesorId,
@@ -38,13 +38,14 @@ router.post("/", requireAuth, async (req, res) => {
     });
   } catch (error) {
     console.error("❌ Error al crear reporte:", error);
-    res
-      .status(500)
-      .json({ ok: false, error: "Error interno al crear el reporte." });
+    res.status(500).json({
+      ok: false,
+      error: "Error interno al crear el reporte.",
+    });
   }
 });
 
-// 📋 Obtener todos los reportes (solo admins)
+// 📋 Obtener todos los reportes
 router.get("/", requireAuth, async (req, res) => {
   try {
     const reportes = await Reporte.find()
@@ -52,38 +53,89 @@ router.get("/", requireAuth, async (req, res) => {
         path: "comentarioId",
         model: "Calificacion",
         select: "comentario createdAt estudianteId",
-        populate: {
-          path: "estudianteId",
-          model: "User",
-          select: "email", // ✅ Email del usuario que comentó
-        },
+        populate: { path: "estudianteId", model: "User", select: "email" }
       })
-      .populate({
-        path: "profesorId",
-        model: "Profesor",
-        select: "nombre",
-      })
-      .populate({
-        path: "usuarioId",
-        model: "User",
-        select: "email", // ✅ Usuario que reportó
-      })
-      .sort({ fecha: -1 }); // orden descendente (más recientes primero)
+      .populate({ path: "profesorId", model: "Profesor", select: "nombre" })
+      .populate({ path: "usuarioId", model: "User", select: "email" })
+      .sort({ fecha: -1 });
 
     res.json(reportes);
   } catch (error) {
     console.error("❌ Error al obtener reportes:", error);
-    res
-      .status(500)
-      .json({ ok: false, error: "Error al obtener reportes desde el servidor." });
+    res.status(500).json({
+      ok: false,
+      error: "Error al obtener reportes desde el servidor.",
+    });
   }
 });
 
-// ✅ Actualizar estado del reporte y manejar comentario
+// 🔄 Actualizar estado del reporte
 router.put("/:id", requireAuth, async (req, res) => {
   try {
     const { id } = req.params;
     const { accion } = req.body;
+
+    const reporte = await Reporte.findById(id).populate({
+      path: "comentarioId",
+      model: "Calificacion",
+      populate: {
+        path: "estudianteId",
+        model: "User",
+        select: "email"
+      }
+    });
+
+    if (!reporte) {
+      return res
+        .status(404)
+        .json({ ok: false, error: "Reporte no encontrado." });
+    }
+
+    if (accion === "eliminar") {
+      // 🟡 1. Guardar backup antes de borrar (opcional)
+      if (reporte.comentarioId) {
+        reporte.comentarioBackup = {
+          comentario: reporte.comentarioId.comentario,
+          fecha: reporte.comentarioId.createdAt,
+          usuario: reporte.comentarioId.estudianteId?.email || "No registrado",
+        };
+      }
+
+      // 🟡 2. Borrar comentario real
+      await Calificacion.findByIdAndDelete(reporte.comentarioId?._id);
+
+      // 🟡 3. Eliminar también el reporte
+      await Reporte.findByIdAndDelete(id);
+
+      return res.json({
+        ok: true,
+        message: "Comentario eliminado y reporte eliminado completamente."
+      });
+    }
+
+    if (accion === "mantener") {
+      reporte.estado = "revisado";
+      await reporte.save();
+
+      return res.json({
+        ok: true,
+        message: "Comentario mantenido y reporte revisado.",
+        estado: "revisado",
+      });
+    }
+  } catch (error) {
+    console.error("❌ Error al actualizar reporte:", error);
+    res.status(500).json({
+      ok: false,
+      error: "Error interno al actualizar el reporte.",
+    });
+  }
+});
+
+// 🗑️ Eliminar reporte individual (NO borra comentarios, solo limpiezas)
+router.delete("/:id", requireAuth, async (req, res) => {
+  try {
+    const { id } = req.params;
 
     const reporte = await Reporte.findById(id);
     if (!reporte) {
@@ -92,57 +144,18 @@ router.put("/:id", requireAuth, async (req, res) => {
         .json({ ok: false, error: "Reporte no encontrado." });
     }
 
-    if (accion === "eliminar") {
-      // 🗑️ Eliminar el comentario asociado
-      await Calificacion.findByIdAndDelete(reporte.comentarioId);
-      reporte.estado = "descartado";
-    } else if (accion === "mantener") {
-      // ✅ Mantener el comentario, solo cerrar el reporte
-      reporte.estado = "revisado";
-    } else {
-      return res.status(400).json({ ok: false, error: "Acción no válida." });
-    }
-
-    await reporte.save();
-
-    res.json({
-      ok: true,
-      message:
-        accion === "eliminar"
-          ? "Comentario eliminado y reporte cerrado."
-          : "Comentario mantenido y reporte marcado como revisado.",
-      estado: reporte.estado,
-    });
-  } catch (error) {
-    console.error("❌ Error al actualizar reporte:", error);
-    res
-      .status(500)
-      .json({ ok: false, error: "Error interno al actualizar el reporte." });
-  }
-});
-
-// 🗑️ Eliminar un reporte por ID (admin o autenticado)
-router.delete("/:id", requireAuth, async (req, res) => {
-  try {
-    const { id } = req.params;
-
-    const reporte = await Reporte.findById(id);
-    if (!reporte) {
-      return res.status(404).json({ ok: false, error: "Reporte no encontrado." });
-    }
-
-    // 🔹 Eliminar el reporte de la base de datos
     await Reporte.findByIdAndDelete(id);
 
     res.json({
       ok: true,
-      message: "Reporte eliminado correctamente de la base de datos.",
+      message: "Reporte eliminado correctamente.",
     });
   } catch (error) {
     console.error("❌ Error al eliminar reporte:", error);
-    res
-      .status(500)
-      .json({ ok: false, error: "Error interno al eliminar el reporte." });
+    res.status(500).json({
+      ok: false,
+      error: "Error interno al eliminar el reporte.",
+    });
   }
 });
 

@@ -54,39 +54,48 @@ export default function Moderacion() {
     setTimeout(() => setShowToast(false), 4000);
   };
 
-  // ✅ Eliminar un reporte individualmente (DELETE real)
-  const confirmarEliminar = async () => {
-    if (!reporteSeleccionado) return;
-    try {
-      await deleteReporte(token, reporteSeleccionado._id);
+ const confirmarEliminar = async () => {
+  if (!reporteSeleccionado) return;
 
-      setReportes((prev) =>
-        prev.filter((r) => r._id !== reporteSeleccionado._id)
-      );
+  try {
+    // 🔥 Aquí sí se borra el comentario y el reporte
+    await actualizarEstadoReporte(token, reporteSeleccionado._id, "eliminar");
 
-      setShowConfirmModal(false);
-      mostrarToast("Reporte eliminado permanentemente.", "danger");
-    } catch (err) {
-      console.error("Error al eliminar reporte:", err);
-      mostrarToast("Hubo un error al eliminar el reporte.", "danger");
-    }
-  };
+    // 🔥 Sacar del frontend
+    setReportes((prev) =>
+      prev.filter((r) => r._id !== reporteSeleccionado._id)
+    );
 
-  // ✅ Mantener comentario → actualizar estado
+    setShowConfirmModal(false);
+    setReporteSeleccionado(null);
+    mostrarToast("Comentario y reporte eliminados permanentemente.", "danger");
+  } catch (err) {
+    console.error("Error al eliminar reporte:", err);
+    mostrarToast("Hubo un error al eliminar el comentario.", "danger");
+  }
+};
+
+
+  // 🔥 MANTENER → MARCAR COMO REVISADO
   const handleMantener = async (id) => {
     try {
       const data = await actualizarEstadoReporte(token, id, "mantener");
+
       setReportes((prev) =>
         prev.map((r) => (r._id === id ? { ...r, estado: "revisado" } : r))
       );
-      mostrarToast(data.message || "Comentario mantenido y reporte revisado.", "success");
+
+      mostrarToast(
+        data.message || "Comentario mantenido y reporte revisado.",
+        "success"
+      );
     } catch (err) {
       console.error("Error al actualizar reporte:", err);
       mostrarToast("Hubo un error al actualizar el reporte.", "danger");
     }
   };
 
-  // ✅ Eliminar todos los revisados/descartados de la base de datos
+  // 🔥 ELIMINAR TODOS LOS REVISADOS
   const eliminarTodosRevisados = async () => {
     try {
       const revisados = reportes.filter(
@@ -99,15 +108,11 @@ export default function Moderacion() {
         return;
       }
 
-      // 🔹 Elimina cada reporte revisado del backend
       for (const rep of revisados) {
         await deleteReporte(token, rep._id);
       }
 
-      // 🔹 Elimina del estado local también
-      setReportes((prev) =>
-        prev.filter((r) => r.estado === "pendiente")
-      );
+      setReportes((prev) => prev.filter((r) => r.estado === "pendiente"));
 
       setShowBulkModal(false);
       mostrarToast("Se eliminaron todos los reportes revisados.", "success");
@@ -143,7 +148,7 @@ export default function Moderacion() {
         </Alert>
       ) : reportes.length === 0 ? (
         <Alert variant="info" className="text-center">
-          No hay reportes pendientes por revisar
+          No hay reportes pendientes por revisar.
         </Alert>
       ) : (
         <>
@@ -157,27 +162,32 @@ export default function Moderacion() {
                     <th>Profesor</th>
                     <th>Usuario que comentó</th>
                     <th>Usuario que reportó</th>
-                    <th>Motivo del Reporte</th>
-                    <th>Fecha del Reporte</th>
+                    <th>Motivo</th>
+                    <th>Fecha</th>
                     <th>Estado</th>
                     <th className="text-center">Acciones</th>
                   </tr>
                 </thead>
+
                 <tbody>
                   {reportes.map((r, index) => {
                     const comentario =
                       r.comentarioId?.comentario || "Comentario no disponible";
                     const fechaComentario = r.comentarioId?.createdAt
-                      ? new Date(r.comentarioId.createdAt).toLocaleDateString("es-CL")
+                      ? new Date(r.comentarioId.createdAt).toLocaleDateString(
+                          "es-CL"
+                        )
                       : "—";
                     const profesor = r.profesorId?.nombre || "Desconocido";
                     const usuarioComentario =
                       r.comentarioId?.estudianteId?.email || "No registrado";
                     const usuarioReporte = r.usuarioId?.email || "Anónimo";
-                    const fechaReporte = new Date(r.fecha).toLocaleDateString("es-CL");
+                    const fechaReporte = new Date(r.fecha).toLocaleDateString(
+                      "es-CL"
+                    );
 
                     return (
-                      <tr key={r._id || index}>
+                      <tr key={r._id}>
                         <td>{index + 1}</td>
                         <td>
                           <div>
@@ -202,11 +212,11 @@ export default function Moderacion() {
                                 : "secondary"
                             }
                             text={r.estado === "pendiente" ? "dark" : "light"}
-                            className="estado-badge"
                           >
-                            {r.estado.charAt(0).toUpperCase() + r.estado.slice(1)}
+                            {r.estado[0].toUpperCase() + r.estado.slice(1)}
                           </Badge>
                         </td>
+
                         <td className="text-center">
                           {r.estado === "pendiente" ? (
                             <div className="d-flex flex-wrap justify-content-center gap-2">
@@ -220,6 +230,7 @@ export default function Moderacion() {
                               >
                                 Eliminar
                               </Button>
+
                               <Button
                                 className="btn-accion-verde"
                                 size="sm"
@@ -242,7 +253,6 @@ export default function Moderacion() {
             </div>
           </Card>
 
-          {/* 🔹 Botón azul alineado a la izquierda */}
           {hayRevisados && (
             <div className="d-flex justify-content-start mt-3">
               <Button
@@ -257,46 +267,56 @@ export default function Moderacion() {
         </>
       )}
 
-      {/* ✅ Modal confirmación múltiple */}
+      {/* 🔥 MODAL INDIVIDUAL */}
+      <Modal
+        show={showConfirmModal}
+        onHide={() => setShowConfirmModal(false)}
+        centered
+      >
+        <Modal.Body className="text-center p-4">
+          <h5 className="fw-bold mb-3">¿Eliminar este reporte?</h5>
+          <p className="text-muted">
+            Esta acción eliminará el reporte de manera permanente.
+          </p>
+
+          <div className="d-flex justify-content-center gap-3 mt-3">
+            <Button variant="secondary" onClick={() => setShowConfirmModal(false)}>
+              Cancelar
+            </Button>
+
+            <Button variant="danger" onClick={confirmarEliminar}>
+              Sí, eliminar
+            </Button>
+          </div>
+        </Modal.Body>
+      </Modal>
+
+      {/* 🔥 MODAL ELIMINACIÓN MASIVA */}
       <Modal
         show={showBulkModal}
         onHide={() => setShowBulkModal(false)}
         centered
-        className="modal-confirmacion"
       >
         <Modal.Body className="text-center p-4">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="50"
-            height="50"
-            fill="currentColor"
-            className="bi bi-exclamation-triangle-fill text-warning mb-3 animate-pulse"
-            viewBox="0 0 16 16"
-          >
-            <path d="M8.982 1.566a1.13 1.13 0 0 0-1.964 0L.165 13.233c-.457.778.091 1.767.982 1.767h13.706c.89 0 1.438-.99.982-1.767L8.982 1.566zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5zm.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2z" />
-          </svg>
-
-          <h5 className="fw-bold mb-2">¿Eliminar todos los comentarios revisados?</h5>
+          <h5 className="fw-bold mb-2">
+            ¿Eliminar todos los comentarios revisados?
+          </h5>
           <p className="text-muted mb-4">
-            Esta acción eliminará permanentemente todos los reportes marcados como revisados o descartados.
+            Esta acción borrará permanentemente todos los reportes revisados o descartados.
           </p>
 
           <div className="d-flex justify-content-center gap-3">
             <Button variant="secondary" onClick={() => setShowBulkModal(false)}>
               Cancelar
             </Button>
-            <Button
-              variant="primary"
-              className="btn-eliminar-confirm"
-              onClick={eliminarTodosRevisados}
-            >
+            <Button variant="primary" onClick={eliminarTodosRevisados}>
               Sí, eliminar todo
             </Button>
           </div>
         </Modal.Body>
       </Modal>
 
-      {/* ✅ Toast */}
+      {/* 🔥 TOAST */}
       <ToastContainer className="toast-container-fijo">
         {showToast && (
           <Toast
